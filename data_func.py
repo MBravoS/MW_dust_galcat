@@ -1,3 +1,12 @@
+'''Here is where the user should add the functions that they need to
+prepare the data on the file style expected by the main function.
+The main code expects the catalogue to be in CSV files, splitted by
+HEALPix pixelization, each contaning at least the redshift and two
+bands for the photometry'''
+
+########################################
+# Create a simple test mock
+########################################
 def test(file_path):
 	import os
 	import numpy as np
@@ -13,9 +22,9 @@ def test(file_path):
 	####################
 	# Create galaxies
 	####################
-	temp=np.random.uniform(22.8,24.8,100)
+	temp=np.linspace(22.8,24.8,1000)
 	temp={f:temp for f in filter_set}
-	temp['id_galaxy']=np.arange(100)
+	temp['id_galaxy']=np.arange(1000)
 	
 	####################
 	# Position galaxies
@@ -30,11 +39,24 @@ def test(file_path):
 	ra_region,dec_region=pf.pix2ang(64,pix_region,nest=False,lonlat=True)
 	data=[]
 	for i in range(len(pix_region)):
-		print(f'{ra_region[i]:.2f},{dec_region[i]:.2f}')
 		for j in range(len(zrange)):
 			temp['ra']=ra_region[i]
 			temp['dec']=dec_region[i]
-			temp['redshift, cosmological']=(zrange[j][0]+zrange[j][1])/2
+			temp['zobs']=(zrange[j][0]+zrange[j][1])/2
 			data.append(pd.DataFrame(temp))
 	data=pd.concat(data)
-	data.to_csv(f'{file_path}test_dataset.csv',index=False)
+	big_pixels=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
+	big_pixel_ID=np.unique(big_pixels)
+	
+	####################
+	# File save
+	####################
+	#data.to_csv(f'{file_path}test_dataset.csv',index=False)
+	fnames=[]
+	for pix in big_pixel_ID:
+		fname=f'{file_path}test_galaxies_{pix}.csv'
+		fnames.append(fname)
+		data_subset=data.loc[big_pixels==pix]
+		data_subset.to_csv(fname,index=False)
+	return(fnames)
+
