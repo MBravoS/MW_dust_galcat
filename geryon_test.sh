@@ -5,8 +5,8 @@
 #PBS -l nodes=1:ppn=56
 #PBS -l walltime=02:00:00
 #PBS -q newton
-#PBS -m ae
-#PBS -M matias.bravo@icrar.org
+#PBS -e /home/mbravo/MW_dust_galcat/test_error.txt
+#PBS -o /home/mbravo/MW_dust_galcat/test_output.txt
 
 ##########################
 
