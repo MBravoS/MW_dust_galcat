@@ -10,5 +10,5 @@
 
 ##########################
 
-#python MW_dust_ext_calc.py -d test -p True -o /home/mbravo/Documents/MWdust_testing_data/ -plt /home/mbravo/Documents/MWdust_testing_data/ -bc True
-python MW_dust_ext_calc.py -d test -i /home/mbravo/Documents/MWdust_testing_data/ -o /home/mbravo/Documents/MWdust_testing_data/ -plt /home/mbravo/Documents/MWdust_testing_data/ -bc True
+rm /home/mbravo/Documents/MWdust_testing_data/*
+python MW_dust_ext_calc.py -d test -p True -o /home/mbravo/Documents/MWdust_testing_data/ -plt /home/mbravo/Documents/MWdust_testing_data/ -bc True

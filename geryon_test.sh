@@ -10,6 +10,6 @@
 
 ##########################
 
+rm /fast_scratch2/mbravo/MWdust_data/*test* /fast_scratch2/mbravo/MWdust_plots/*test*
 cd /home/mbravo/MW_dust_galcat
-which python
 python MW_dust_ext_calc.py -d test -p True -o /fast_scratch2/mbravo/MWdust_data/ -plt /fast_scratch2/mbravo/MWdust_plots/ -bc True

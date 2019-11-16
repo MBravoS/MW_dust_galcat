@@ -54,9 +54,10 @@ def test(file_path):
 	#data.to_csv(f'{file_path}test_dataset.csv',index=False)
 	fnames=[]
 	for pix in big_pixel_ID:
-		fname=f'{file_path}test_galaxies_{pix}.csv'
+		fname=f'{file_path}galaxies_test_{pix}.csv'
 		fnames.append(fname)
 		data_subset=data.loc[big_pixels==pix]
 		data_subset.to_csv(fname,index=False)
+	print('Test data created')
 	return(fnames)
 
