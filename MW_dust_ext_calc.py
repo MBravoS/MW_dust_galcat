@@ -20,6 +20,7 @@ def main():
 	parser.add_argument('-p','--prepare_data',help='The function from aux_func to copy the data into the file scheme that the code uses.',default=False)
 	parser.add_argument('-i','--in_dir',help='The input folder.',default='./')
 	parser.add_argument('-o','--out_dir',help='The output folder.',default='./')
+	parser.add_argument('-plt','--plot_dir',help='The plot folder.',default='./')
 	parser.add_argument('-m','--multithread',help='The number of threads for parallelisation.',default=False)
 	parser.add_argument('-bc','--border_check',help='Keep or discard border pixels.',default=False)
 	opts=parser.parse_args()
@@ -38,7 +39,7 @@ def main():
 	####################
 	# Describe data
 	####################
-	main_func.data_char(fnames,'u_ap','u_ap','z_ap',opts.out_dir)
+	main_func.data_char(fnames,'u_ap','u_ap','z_ap',opts.out_dir,opts.plot_dir)
 	
 	####################
 	# Pixelate data
