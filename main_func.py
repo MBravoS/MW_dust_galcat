@@ -3,8 +3,8 @@
 ########################################
 # Data characterization
 ########################################
-def data_char(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]],
-				mag_cut=24.8,sigma_cut=False,multithread=False):
+def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]],
+				mag_cut=24.8,b1_cut=99,b2_cut=99,dusted=False,multithread=False):
 	import aux_func
 	import numpy as np
 	import pandas as pd
@@ -12,15 +12,34 @@ def data_char(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.3]
 	import matplotlib.cm as cm
 	import multiprocessing as mp
 	import matplotlib.pyplot as plot
+	
 	sp.use_style('splotch.style')
 	fs=np.array(plot.rcParams.get('figure.figsize'))
+	fd=''
 	
 	####################
 	# Reading data in
 	####################
-	print('Reading galaxy data for characterisation')
+	print('Reading galaxy data for dust vector calculation')
 	run_name=fnames[0].split("galaxies_")[1].split('_')[0]
 	data=pd.concat([pd.read_csv(f) for f in fnames])
+	ebv=np.zeros(len(data))
+	if dusted:
+		fd+='_dusted'
+		sfd_key=[k for k in data.columns.values if 'SFD' in k]
+		if len(sfd_key)>1:
+			sfd_nside=np.array([int(s.split('_')[1]) for s in sfd_key])
+			maxfound=False
+			j=0
+			while not maxfound:
+				if sfd_nside[j]==np.max(sfd_nside):
+					maxfound=True
+				else:
+					j+=1
+			sfd_key=sfd_key[np.arange(len(sfd_key))[sfd_nside==np.max(sfd_nside)]]
+			ebv=data[sfd_key]
+		else:
+			ebv=np.array(data[sfd_key[0]])
 	
 	####################
 	# Extinction effect
@@ -34,9 +53,12 @@ def data_char(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.3]
 	if multithread:
 		cpus=min(multithread,len(Ar))
 		pool1=mp.Pool(processes=cpus)
-		vector_comp=[pool1.apply(aux_func.dust_vector(data,band_sel,band_1,band_2,z,A_sel,A_b1,E_b1b2,mag_cut,)) for z in z_range]
+		vector_comp=[pool1.apply(aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,
+														band_1,band_2,A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,ebv,)) for z in z_range]
 	else:
-		vector_comp=[aux_func.dust_vector(data,band_sel,band_1,band_2,z,A_sel,A_b1,E_b1b2,mag_cut) for z in z_range]
+		vector_comp=[aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
+											A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,
+											ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in z_range]
 	
 	delta=[]
 	mag=[]
@@ -46,7 +68,8 @@ def data_char(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.3]
 		mag.append(vector_comp[i]['mag'])
 		col.append(vector_comp[i]['col'])
 		zstr=f'{(z_range[i][0]+z_range[i][1])/2:.2f}'.translate({ord(c): None for c in '.'})
-		vector_comp[i].to_csv(f'{data_dir}dust_vector_{run_name}_z{zstr}.csv',index=False)
+		if dusted:
+			vector_comp[i].to_csv(f'{data_dir}dust_vector_{run_name}_z{zstr}.csv',index=False)
 	print('Dust vectors saved')
 	
 	####################
@@ -69,13 +92,13 @@ def data_char(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.3]
 	sp.plot(EBV,col,c=cr,xlabel='E(B-V) [mag]',ylabel=f'${band_1[0]}-{band_2[0]}$ [mag]')
 	sp.plot(EBV[0],E_b1b2,c='k',linestyle='dotted',plabel=f'E$({band_1[0]}-{band_2[0]})$ [mag]')
 	plot.tight_layout()
-	plot.savefig(f'{plot_dir}dust_vector_{run_name}.pdf')
+	plot.savefig(f'{plot_dir}dust_vector_{run_name}{fd}.pdf')
 	plot.close()
 
 ########################################
 # Assign the galaxies to HEALPix pixels
 ########################################
-def pixel_assign(fnames,nside=[64],border_check=False,multithread=False):
+def pixel_assign(fnames,nside=[64],border_check=False,simple_ebv=True,multithread=False):
 	import aux_func
 	import numpy as np
 	import pandas as pd
@@ -86,7 +109,10 @@ def pixel_assign(fnames,nside=[64],border_check=False,multithread=False):
 	# Reading data in
 	####################
 	print('Reading Schlegel map')
-	ebv_map=[np.ones(pf.nside2npix(n))/10.0 for n in nside]#[aux_func.sfd_map(percent=False,resample=n,lsst_footprint=False) for n in nside]
+	if simple_ebv:
+		ebv_map=[np.ones(pf.nside2npix(n))/10.0 for n in nside]
+	else:
+		ebv_map=[aux_func.sfd_map(percent=False,resample=n,lsst_footprint=False) for n in nside]
 	
 	print('Reading galaxy data for pixelisation')
 	if multithread:
@@ -119,24 +145,24 @@ def pixel_assign(fnames,nside=[64],border_check=False,multithread=False):
 ########################################
 # Calculate pixel properties
 ########################################
-def pixel_stats(fnames,nside,band_1,band_2,cc_bands,redshift_cuts=[0.3,0.6,0.9,1.2],mag_cut=False,sigma_cut=False):
+def pixel_stat(fnames,nside,band_sel,band_1,band_2,z_range=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]],
+				mag_cut=False,multithread=False):
+	import aux_func
 	import numpy as np
 	import pandas as pd
 	import multiprocessing as mp
 	
-	Lz=len(redshift_cuts)+1
-	Ln=len(nside)
-	
 	####################
 	# Stats calculation
 	####################
-	pool=mp.Pool(processes=cpus)
-	results=[[[pool.apply_async(base.Pix_Stats_Calc,(nside[j],fnames[j][k],zcond[i][j][k],band_1,band_2,cc_bands,r_band,
-									r_cut,EBV_map[j],sigma_cut,)) for k in xrange(len(fnames[j]))] for j in xrange(L2)] for i in xrange(L1)]
-	results=[[[p3.get() for p3 in p2] for p2 in p1] for p1 in results2]
-	pool.close()
-	#results2=[[[base.Pix_Stats_Calc(nside[j],fnames[j][k],zcond[i][j][k],band_1,band_2,cc_bands,r_band,
-	#								r_cut,EBV_map[j],sigma_cut) for k in xrange(len(fnames[j]))] for j in xrange(L2)] for i in xrange(L1)]
+	if multithread:
+		pool=mp.Pool(processes=cpus)
+		results=[[[pool.apply_async(aux_func.pix_stat,(nside[j],fnames[j][k],zcond[i][j][k],band_1,band_2,cc_bands,r_band,
+										r_cut,EBV_map[j],sigma_cut,)) for k in xrange(len(fnames[j]))] for j in xrange(L2)] for i in xrange(L1)]
+		results=[[[p3.get() for p3 in p2] for p2 in p1] for p1 in results2]
+		pool.close()
+	else:
+		results=[aux_func.pix_stat(f,nside,z_range,band_sel,band_1,band_2,mag_cut) for f in fnames]
 	print 'Basic stats ready'
 	stats_dict={}
 	#Pix values

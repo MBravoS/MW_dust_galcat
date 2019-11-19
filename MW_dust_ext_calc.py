@@ -23,6 +23,7 @@ def main():
 	parser.add_argument('-plt','--plot_dir',help='The plot folder.',default='./')
 	parser.add_argument('-m','--multithread',help='The number of threads for parallelisation.',default=False)
 	parser.add_argument('-bc','--border_check',help='Keep or discard border pixels.',default=False)
+	parser.add_argument('-sm','--simple_dust_map',help='Test recovery of homogeneous E(B-V)=0.1 map.',default=False)
 	opts=parser.parse_args()
 	
 	#if not opts.input:
@@ -37,14 +38,20 @@ def main():
 		fnames=glob.glob(f'{opts.in_dir}/galaxies_{opts.data_files}*csv')
 	
 	####################
-	# Describe data
+	# Dust vector
 	####################
-	main_func.data_char(fnames,'u_ap','u_ap','z_ap',opts.out_dir,opts.plot_dir)
-	
+	main_func.dust_vector(fnames,'u_ap','u_ap','z_ap',opts.out_dir,opts.plot_dir)
+		
 	####################
 	# Pixelate data
 	####################
-	main_func.pixel_assign(fnames,nside=[64],border_check=opts.border_check,multithread=opts.multithread)
+	main_func.pixel_assign(fnames,nside=[64],border_check=opts.border_check,multithread=opts.multithread,
+							simple_ebv=opts.simple_dust_map)
+	
+	####################
+	# Dust vector
+	####################
+	main_func.dust_vector(fnames,'u_ap','u_ap','z_ap',opts.out_dir,opts.plot_dir,dusted=True)
 	
 	####################
 	# Pixel properties
