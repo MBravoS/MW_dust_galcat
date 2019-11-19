@@ -103,62 +103,65 @@ def pix_id(fname,nside,sfd_map):
 ########################################
 # Calculate the pixel properties
 ########################################
-#def pix_stat(fname,nside,zr,bs,b1,b2,mc):
-#	import numpy as np
-#	import pandas as pd
-#	import scipy.stats as stats
-#	
-#	#No dust
-#	
-#	
-#	
-#	nside_str=str(int(np.log2(nside))).zfill(2)
-#	nbin='bin, angular, '+nside_str
-#	cols=list(set([nbin,band_1,band_2,r_band,'redshift, cosmological']+[b for cc in cc_bands for b in cc]))
-#	data=pd.read_csv(fname,usecols=cols)
-#	data=data.loc[zcond]
-#	bin_id,bin_id_pos,counts=np.unique(data[nbin],return_counts=True,return_inverse=True)
-#	histogram_bins=np.empty(len(bin_id)+1)
-#	histogram_bins[:-1]=bin_id-0.5
-#	histogram_bins[1:]=bin_id+0.5
-#	mag,temp1,temp2=stats.binned_statistic(data[nbin],data[band_1],statistic='median',bins=histogram_bins)
-#	colour,temp1,temp2=stats.binned_statistic(data[nbin],data[band_1]-data[band_2],statistic='median',bins=histogram_bins)
-#	redshift,temp1,temp2=stats.binned_statistic(data[nbin],data['redshift, cosmological'],statistic='median',bins=histogram_bins)
-#	colour_comp_1,temp1,temp2=stats.binned_statistic(data[nbin],data[cc_bands[0][0]]-data[cc_bands[0][1]],statistic='median',bins=histogram_bins)
-#	colour_comp_2,temp1,temp2=stats.binned_statistic(data[nbin],data[cc_bands[1][0]]-data[cc_bands[1][1]],statistic='median',bins=histogram_bins)
-#	del temp1,temp2
-#	#With dust
-#	fname_lc_pos=fname.rfind('/')+1
-#	lc_name=fname[fname_lc_pos:fname_lc_pos+4]
-#	bands=[lc_name+i+'-band, apparent' for i in [' u',' g',' r',' i',' z']]
-#	sigma_band=np.array([6.0399,2.0000,1.6635,3.168,6.6226])*1e-12
-#	sigma={bands[i]:sigma_band[i] for i in xrange(5)}
-#	EBV_pix=np.random.choice(ebv_map,size=len(bin_id),replace=False)
-#	mag_A1,col_E=ExtinctionLaw(EBV_pix,band_1,band_2)
-#	mag_A2=mag_A1-col_E
-#	mag_R,temp=ExtinctionLaw(EBV_pix,r_band,band_2)
-#	del EBV_pix,temp
-#	data[band_1]+=np.array([mag_A1[i] for i in bin_id_pos])
-#	data[band_2]+=np.array([mag_A2[i] for i in bin_id_pos])
-#	data[r_band]+=np.array([mag_R[i] for i in bin_id_pos])
-#	if sigma_cut:
-#		sigma_cuts=(data[band_1]<=-2.5*np.log10(sigma_cut*sigma[band_1]))
-#		sigma_cuts&=(data[band_2]<=-2.5*np.log10(sigma_cut*sigma[band_2]))
-#	else:
-#		sigma_cuts=(data[band_1]<=98)
-#		sigma_cuts&=(data[band_2]<=98)
-#	mag_cut=(sigma_cuts)&(data[r_band]<=r_cut)
-#	if np.sum(mag_cut)>0:
-#		data=data.loc[mag_cut]
-#		bin_id_AE,counts_AE=np.unique(data[nbin],return_counts=True)
-#		histogram_bins_AE=np.empty(len(bin_id_AE)+1)
-#		histogram_bins_AE[:-1]=bin_id_AE-0.5
-#		histogram_bins_AE[1:]=bin_id_AE+0.5
-#		mag_A,temp1,temp2=stats.binned_statistic(data[nbin],data[band_1],statistic='median',bins=histogram_bins_AE)
-#		col_E,temp1,temp2=stats.binned_statistic(data[nbin],data[band_1]-data[band_2],statistic='median',bins=histogram_bins_AE)
-#	else:
-#		counts_AE,mag_A,col_E=[np.array([])]*3
-#	return(counts,mag,colour,redshift,colour_comp_1,colour_comp_2,bin_id,counts_AE,mag_A,col_E)
+def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
+	import numpy as np
+	import pandas as pd
+	import scipy.stats as stats
+	
+	data_full=pd.read_csv(fname)
+	pixel_df={}
+	
+	for ns in nside:
+		nside_key=f'nside_{np.log2(ns):.0f}'
+		for z in zr:
+			####################
+			# Data read
+			####################
+			data_sel=data_full.loc[(data_full['zobs']>z[0])&(data_full['zobs']<z[1])].copy()
+			if bcheck:
+				data_sel=data_sel.loc[~data_sel[f'{nside_key}_border']]
+			
+			####################
+			# Add extinction
+			####################
+			A1,E12=extinction_law(data_sel[f'{nside_key}_SFDmap'],b1,b2)
+			Asel,temp=extinction_law(data_sel[f'{nside_key}_SFDmap'],bsel,b2)
+			A2=A1-E12
+			
+			data_sel[bsel]+=Asel
+			data_sel[b1]+=A1
+			data_sel[b2]+=A2
+			
+			mag_sel=data_sel[bsel]<mcut
+			mag_sel&=data_sel[b1]<b1cut
+			mag_sel&=data_sel[b2]<b2cut
+			
+			data_sel=data_sel.loc[mag_sel]
+			
+			####################
+			# Pixel values
+			####################
+			bin_id,bin_id_pos,counts=np.unique(data_sel[nside_key],return_counts=True,return_inverse=True)
+			histogram_bins=np.array([b-0.5 for b in bin_id]+[bin_id[-1]+0.5])
+			
+			mag=stats.binned_statistic(data_sel[nside_key],data_sel[b1],statistic='median',bins=histogram_bins)[0]
+			col=stats.binned_statistic(data_sel[nside_key],data_sel[b1]-data_sel[b2],statistic='median',bins=histogram_bins)[0]
+			ebv=stats.binned_statistic(data_sel[nside_key],data_sel[f'{nside_key}_SFDmap'],statistic='median',bins=histogram_bins)[0]
+			
+			pixel_df[f'{nside_key}_pixID']=bin_id
+			pixel_df[f'{nside_key}_EBV']=ebv
+			pixel_df[f'{nside_key}_z{np.sum(z)/2:.2f}_count'.replace('.','')]=counts
+			pixel_df[f'{nside_key}_z{np.sum(z)/2:.2f}_mag'.replace('.','')]=mag
+			pixel_df[f'{nside_key}_z{np.sum(z)/2:.2f}_col'.replace('.','')]=col
+	
+	L=0
+	for k in pixel_df.keys():
+		L=max(L,len(pixel_df[k]))
+	for k in pixel_df.keys():
+		if len(pixel_df[k])<L:
+			missing=L-len(pixel_df[k])
+			pixel_df[k]=np.concatenate([pixel_df[k],np.array([None]*missing)])
+	pd.DataFrame(pixel_df).to_csv(fname.replace('galaxies','pixel'),index=False)
 
 ########################################
 # Read in the Schlegel map

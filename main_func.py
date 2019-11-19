@@ -3,8 +3,7 @@
 ########################################
 # Data characterization
 ########################################
-def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]],
-				mag_cut=24.8,b1_cut=99,b2_cut=99,dusted=False,multithread=False):
+def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range,mag_cut=24.8,b1_cut=99,b2_cut=99,dusted=False,multithread=False):
 	import aux_func
 	import numpy as np
 	import pandas as pd
@@ -49,12 +48,16 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.
 	A_b1,E_b1b2=aux_func.extinction_law(EBV,band_1,band_2)
 	A_b2=A_b1-E_b1b2
 	
-	print('Calculating dust vectors')
+	if dusted:
+		print('Calculating observed dust vectors')
+	else:
+		print('Calculating intrinsic dust vectors')
 	if multithread:
 		cpus=min(multithread,len(Ar))
 		pool1=mp.Pool(processes=cpus)
-		vector_comp=[pool1.apply(aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,
-														band_1,band_2,A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,ebv,)) for z in z_range]
+		vector_comp=[pool1.apply(aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
+														A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,
+														ebv[(data['zobs']>z[0])&(data['zobs']<z[1])],)) for z in z_range]
 	else:
 		vector_comp=[aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
 											A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,
@@ -70,7 +73,8 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.
 		zstr=f'{(z_range[i][0]+z_range[i][1])/2:.2f}'.translate({ord(c): None for c in '.'})
 		if dusted:
 			vector_comp[i].to_csv(f'{data_dir}dust_vector_{run_name}_z{zstr}.csv',index=False)
-	print('Dust vectors saved')
+	if dusted:
+		print('Dust vectors saved')
 	
 	####################
 	# Plots
@@ -98,7 +102,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range=[[0.0,0.
 ########################################
 # Assign the galaxies to HEALPix pixels
 ########################################
-def pixel_assign(fnames,nside=[64],border_check=False,simple_ebv=True,multithread=False):
+def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=False):
 	import aux_func
 	import numpy as np
 	import pandas as pd
@@ -110,7 +114,7 @@ def pixel_assign(fnames,nside=[64],border_check=False,simple_ebv=True,multithrea
 	####################
 	print('Reading Schlegel map')
 	if simple_ebv:
-		ebv_map=[np.ones(pf.nside2npix(n))/10.0 for n in nside]
+		ebv_map=[np.linspace(-1.1,1.2,pf.nside2npix(n)) for n in nside]
 	else:
 		ebv_map=[aux_func.sfd_map(percent=False,resample=n,lsst_footprint=False) for n in nside]
 	
@@ -145,8 +149,7 @@ def pixel_assign(fnames,nside=[64],border_check=False,simple_ebv=True,multithrea
 ########################################
 # Calculate pixel properties
 ########################################
-def pixel_stat(fnames,nside,band_sel,band_1,band_2,z_range=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]],
-				mag_cut=False,multithread=False):
+def pixel_stat(fnames,nside,band_sel,band_1,band_2,z_range,mag_cut=24.8,b1_cut=99,b2_cut=99,border_check=False,multithread=False):
 	import aux_func
 	import numpy as np
 	import pandas as pd
@@ -155,27 +158,12 @@ def pixel_stat(fnames,nside,band_sel,band_1,band_2,z_range=[[0.0,0.3],[0.3,0.6],
 	####################
 	# Stats calculation
 	####################
+	print('Calculating pixelised properties')
 	if multithread:
 		pool=mp.Pool(processes=cpus)
-		results=[[[pool.apply_async(aux_func.pix_stat,(nside[j],fnames[j][k],zcond[i][j][k],band_1,band_2,cc_bands,r_band,
-										r_cut,EBV_map[j],sigma_cut,)) for k in xrange(len(fnames[j]))] for j in xrange(L2)] for i in xrange(L1)]
-		results=[[[p3.get() for p3 in p2] for p2 in p1] for p1 in results2]
+		results=[pool.apply_async(aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,z_range,border_check,)) for f in fnames]
+		results=[r.get() for r in results]
 		pool.close()
 	else:
-		results=[aux_func.pix_stat(f,nside,z_range,band_sel,band_1,band_2,mag_cut) for f in fnames]
-	print 'Basic stats ready'
-	stats_dict={}
-	#Pix values
-	stats_dict['counts']=[[np.concatenate([fn[0] for fn in ns]) for ns in zc] for zc in results2]
-	stats_dict['mag']=[[np.concatenate([fn[1] for fn in ns]) for ns in zc] for zc in results2]
-	stats_dict['colour']=[[np.concatenate([fn[2] for fn in ns]) for ns in zc] for zc in results2]
-	stats_dict['redshift']=[[np.concatenate([fn[3] for fn in ns]) for ns in zc] for zc in results2]
-	stats_dict['colour_comp_1']=[[np.concatenate([fn[4] for fn in ns]) for ns in zc] for zc in results2]
-	stats_dict['colour_comp_2']=[[np.concatenate([fn[5] for fn in ns]) for ns in zc] for zc in results2]
-	stats_dict['pix_ID']=[[np.concatenate([fn[6] for fn in ns]) for ns in zc] for zc in results2]
-	stats_dict['counts_AE']=[[np.concatenate([fn[7] for fn in ns]) for ns in zc] for zc in results2]
-	stats_dict['mag_A']=[[np.concatenate([fn[8] for fn in ns]) for ns in zc] for zc in results2]
-	stats_dict['col_E']=[[np.concatenate([fn[9] for fn in ns]) for ns in zc] for zc in results2]
-	del results2
-	with open(data_dir+lc+mag_type+'_stats.dat', 'wb') as fp:
-		pickle.dump(stats_dict,fp)
+		results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,z_range,border_check) for f in fnames]
+	print('Statistics ready')

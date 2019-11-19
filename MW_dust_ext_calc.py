@@ -24,7 +24,20 @@ def main():
 	parser.add_argument('-m','--multithread',help='The number of threads for parallelisation.',default=False)
 	parser.add_argument('-bc','--border_check',help='Keep or discard border pixels.',default=False)
 	parser.add_argument('-sm','--simple_dust_map',help='Test recovery of homogeneous E(B-V)=0.1 map.',default=False)
+	parser.add_argument('-n','--nside',help='HEALPix nside to be used for the map recovery.',default=64,nargs='+',type=int)
+	parser.add_argument('-z','--zbins',help='Bin edges for the redshift bins.',default=None,nargs='+',type=float)
 	opts=parser.parse_args()
+	
+	####################
+	# Check inputs
+	####################
+	if type(opts.nside) is not list:
+		opts.nside=[opts.nside]
+	
+	if opts.zbins is None:
+		opts.zbins=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]]
+	else:
+		opts.zbins=[[opts.zbins[i],opts.zbins[i+1]] for i in range(len(opts.zbins)-1)]
 	
 	#if not opts.input:
 	#	parser.error('An input is needed')
@@ -40,22 +53,23 @@ def main():
 	####################
 	# Dust vector
 	####################
-	main_func.dust_vector(fnames,'u_ap','u_ap','z_ap',opts.out_dir,opts.plot_dir)
+	main_func.dust_vector(fnames,'u_ap','u_ap','z_ap',opts.out_dir,opts.plot_dir,opts.zbins)
 		
 	####################
 	# Pixelate data
 	####################
-	main_func.pixel_assign(fnames,nside=[64],border_check=opts.border_check,multithread=opts.multithread,
+	main_func.pixel_assign(fnames,opts.nside,border_check=opts.border_check,multithread=opts.multithread,
 							simple_ebv=opts.simple_dust_map)
 	
 	####################
 	# Dust vector
 	####################
-	main_func.dust_vector(fnames,'u_ap','u_ap','z_ap',opts.out_dir,opts.plot_dir,dusted=True)
+	main_func.dust_vector(fnames,'u_ap','u_ap','z_ap',opts.out_dir,opts.plot_dir,opts.zbins,dusted=True)
 	
 	####################
 	# Pixel properties
 	####################
+	main_func.pixel_stat(fnames,opts.nside,'u_ap','u_ap','z_ap',opts.zbins,border_check=opts.border_check,multithread=opts.multithread)
 
 if __name__ == '__main__':
 	main()
