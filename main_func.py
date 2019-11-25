@@ -58,9 +58,8 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range,mag_cut=
 	else:
 		print('Calculating intrinsic dust vectors')
 	if multithread:
-		cpus=min(multithread,len(Ar))
-		pool1=mp.Pool(processes=cpus)
-		vector_comp=[pool1.apply(aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
+		pool=mp.Pool(processes==min(multithread,len(Ar)))
+		vector_comp=[pool.apply(aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
 														A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,
 														ebv[(data['zobs']>z[0])&(data['zobs']<z[1])],)) for z in z_range]
 	else:
@@ -126,9 +125,8 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	
 	print('Reading galaxy data for pixelisation')
 	if multithread:
-		cpus=min(multithread,len(fnames))
-		pool1=mp.Pool(processes=cpus)
-		temp=[pool1.apply_async(aux_func.pix_id,(f,nside,ebv_map,)) for f in fnames]
+		pool=mp.Pool(processes=min(multithread,len(fnames)))
+		temp=[pool.apply_async(aux_func.pix_id,(f,nside,ebv_map,)) for f in fnames]
 		temp=[t.get() for t in temp]
 	else:
 		temp=[aux_func.pix_id(f,nside,ebv_map) for f in fnames]
@@ -142,9 +140,8 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	print('Checking borders')
 	if border_check:
 		if multithread:
-			cpus=min(multithread,len(fnames))
-			pool2=mp.Pool(processes=cpus)
-			temp=[pool2.apply_async(aux_func.find_border,(f,pix_ids,nside,res,)) for f in fnames]
+			pool=mp.Pool(processes=min(multithread,len(fnames)))
+			temp=[pool.apply_async(aux_func.find_border,(f,pix_ids,nside,res,)) for f in fnames]
 			temp=[t.get() for t in temp]
 		else:
 			temp=[aux_func.find_border(f,pix_ids,nside,res) for f in fnames]
@@ -166,7 +163,7 @@ def pixel_stat(fnames,nside,band_sel,band_1,band_2,z_range,mag_cut=24.8,b1_cut=9
 	####################
 	print('Calculating pixelised properties')
 	if multithread:
-		pool=mp.Pool(processes=cpus)
+		pool=mp.Pool(processes=min(multithread,len(fnames)))
 		results=[pool.apply_async(aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,z_range,border_check,)) for f in fnames]
 		results=[r.get() for r in results]
 		pool.close()
