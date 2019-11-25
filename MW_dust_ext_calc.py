@@ -21,7 +21,7 @@ def main():
 	parser.add_argument('-i','--in_dir',help='The input folder.',default='./')
 	parser.add_argument('-o','--out_dir',help='The output folder.',default='./')
 	parser.add_argument('-plt','--plot_dir',help='The plot folder.',default='./')
-	parser.add_argument('-m','--multithread',help='The number of threads for parallelisation.',default=False)
+	parser.add_argument('-m','--multithread',help='The number of threads for parallelisation.',default=None,type=int)
 	parser.add_argument('-bc','--border_check',help='Keep or discard border pixels.',default=False)
 	parser.add_argument('-sm','--simple_dust_map',help='Test recovery of homogeneous E(B-V)=0.1 map.',default=False)
 	parser.add_argument('-n','--nside',help='HEALPix nside to be used for the map recovery.',default=64,nargs='+',type=int)
