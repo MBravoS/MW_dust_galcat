@@ -1,6 +1,6 @@
 #!/bin/bash
 #PBS -V
-#PBS -N MWdust_test
+#PBS -N MWdust_DESI
 #PBS -k eo
 #PBS -l nodes=1:ppn=56
 #PBS -l walltime=02:00:00
