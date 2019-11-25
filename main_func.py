@@ -2,13 +2,27 @@
 ########################################
 # Dust map recovery
 ########################################
-def dust_mapping(pnames):
-	print(pnames)
+def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
+	import numpy as np
+	import pandas as pd
+	import matplotlib.cm as cm
+	import matplotlib.pyplot as plot
+	
+	data=pd.concat(pd.read_csv(p) for p in pnames)
+	for i in range(len(nside)):
+		ns=nside[i]
+		nside_key=f'nside_{np.log2(ns):.0f}'
+		for j in range(len(zrange)):
+			zr=zrange[j]
+			z_key=f'z{np.sum(zr)/2:.2f}'.replace('.','')
+			data[f'{nside_key}_{z_key}_delta']=data[f'{nside_key}_{z_key}_count']+np.random.uniform(-0.5,0.5,len(data))
+			data[f'{nside_key}_{z_key}_delta']=np.log10(data[f'{nside_key}_{z_key}_delta']/np.mean(data[f'{nside_key}_{z_key}_delta']))
+			
 
 ########################################
 # Dust vector calculation
 ########################################
-def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range,mag_cut=24.8,b1_cut=99,b2_cut=99,dusted=False,multithread=False):
+def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=24.8,b1_cut=99,b2_cut=99,dusted=False,multithread=False):
 	import aux_func
 	import numpy as np
 	import pandas as pd
@@ -40,7 +54,8 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range,mag_cut=
 					maxfound=True
 				else:
 					j+=1
-			sfd_key=sfd_key[np.arange(len(sfd_key))[sfd_nside==np.max(sfd_nside)]]
+			print(sfd_nside==np.max(sfd_nside))
+			sfd_key=sfd_key[np.arange(len(sfd_key))[sfd_nside==np.max(sfd_nside)][0]]
 			ebv=data[sfd_key]
 		else:
 			ebv=np.array(data[sfd_key[0]])
@@ -61,20 +76,20 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range,mag_cut=
 		pool=mp.Pool(processes==min(multithread,len(Ar)))
 		vector_comp=[pool.apply(aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
 														A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,
-														ebv[(data['zobs']>z[0])&(data['zobs']<z[1])],)) for z in z_range]
+														ebv[(data['zobs']>z[0])&(data['zobs']<z[1])],)) for z in zrange]
 	else:
 		vector_comp=[aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
 											A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,
-											ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in z_range]
+											ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in zrange]
 	
 	delta=[]
 	mag=[]
 	col=[]
-	for i in range(len(z_range)):
+	for i in range(len(zrange)):
 		delta.append(vector_comp[i]['delta'])
 		mag.append(vector_comp[i]['mag'])
 		col.append(vector_comp[i]['col'])
-		zstr=f'{(z_range[i][0]+z_range[i][1])/2:.2f}'.translate({ord(c): None for c in '.'})
+		zstr=f'{(zrange[i][0]+zrange[i][1])/2:.2f}'.translate({ord(c): None for c in '.'})
 		csv_name=f'{data_dir}dust_vector_{run_name}_z{zstr}_nodust.csv'
 		if dusted:
 			csv_name=csv_name.replace('nodust','dusted')
@@ -84,10 +99,10 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range,mag_cut=
 	####################
 	# Plots
 	####################
-	EBV=[EBV]*len(z_range)
+	EBV=[EBV]*len(zrange)
 	vir=cm.get_cmap('viridis')
-	cr=vir(np.array([i/5.0 for i in range(len(z_range))]))
-	zlabel=[f'$z_{{{z[0]},{z[1]}}}$' for z in z_range]
+	cr=vir(np.array([i/5.0 for i in range(len(zrange))]))
+	zlabel=[f'$z_{{{z[0]},{z[1]}}}$' for z in zrange]
 	print('Making E(B-V) vs delta/mag/col plot')
 	
 	plot.figure(figsize=[fs[0],fs[1]*3])
@@ -103,6 +118,9 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range,mag_cut=
 	plot.tight_layout()
 	plot.savefig(f'{plot_dir}dust_vector_{run_name}{fd}.pdf')
 	plot.close()
+	
+	if dusted:
+		return(vector_comp)
 
 ########################################
 # Assign the galaxies to HEALPix pixels
@@ -152,7 +170,7 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 ########################################
 # Calculate pixel properties
 ########################################
-def pixel_stat(fnames,nside,band_sel,band_1,band_2,z_range,mag_cut=24.8,b1_cut=99,b2_cut=99,border_check=False,multithread=False):
+def pixel_stat(fnames,nside,band_sel,band_1,band_2,zrange,mag_cut=24.8,b1_cut=99,b2_cut=99,border_check=False,multithread=False):
 	import aux_func
 	import numpy as np
 	import pandas as pd
@@ -164,10 +182,10 @@ def pixel_stat(fnames,nside,band_sel,band_1,band_2,z_range,mag_cut=24.8,b1_cut=9
 	print('Calculating pixelised properties')
 	if multithread:
 		pool=mp.Pool(processes=min(multithread,len(fnames)))
-		results=[pool.apply_async(aux_func.pix_stat,(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,z_range,border_check,)) for f in fnames]
+		results=[pool.apply_async(aux_func.pix_stat,(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check,)) for f in fnames]
 		results=[r.get() for r in results]
 		pool.close()
 	else:
-		results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,z_range,border_check) for f in fnames]
+		results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check) for f in fnames]
 	print('Statistics ready')
 	return(sorted(results))

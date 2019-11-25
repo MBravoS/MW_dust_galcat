@@ -114,6 +114,7 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 	for ns in nside:
 		nside_key=f'nside_{np.log2(ns):.0f}'
 		for z in zr:
+			z_key=f'z{np.sum(z)/2:.2f}'.replace('.','')
 			####################
 			# Data read
 			####################
@@ -150,9 +151,9 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 			
 			pixel_df[f'{nside_key}_pixID']=bin_id
 			pixel_df[f'{nside_key}_EBV']=ebv
-			pixel_df[f'{nside_key}_z{np.sum(z)/2:.2f}_count'.replace('.','')]=counts
-			pixel_df[f'{nside_key}_z{np.sum(z)/2:.2f}_mag'.replace('.','')]=mag
-			pixel_df[f'{nside_key}_z{np.sum(z)/2:.2f}_col'.replace('.','')]=col
+			pixel_df[f'{nside_key}_{z_key}_count']=counts
+			pixel_df[f'{nside_key}_{z_key}_mag']=mag
+			pixel_df[f'{nside_key}_{z_key}_col']=col
 	
 	L=0
 	for k in pixel_df.keys():

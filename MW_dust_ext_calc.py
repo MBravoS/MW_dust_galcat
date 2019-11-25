@@ -24,22 +24,19 @@ def main():
 	parser.add_argument('-m','--multithread',help='The number of threads for parallelisation.',default=None,type=int)
 	parser.add_argument('-bc','--border_check',help='Keep or discard border pixels.',default=False)
 	parser.add_argument('-sm','--simple_dust_map',help='Test recovery of homogeneous E(B-V)=0.1 map.',default=False)
-	parser.add_argument('-n','--nside',help='HEALPix nside to be used for the map recovery.',default=64,nargs='+',type=int)
+	parser.add_argument('-n','--nside',help='HEALPix nside to be used for the map recovery.',default=[64],nargs='+',type=int)
 	parser.add_argument('-z','--zbins',help='Bin edges for the redshift bins.',default=None,nargs='+',type=float)
 	parser.add_argument('-ms','--sel_band',help='Selection band.',default='r_ap')
 	parser.add_argument('-b1','--band1',help='Band 1.',default='u_ap')
 	parser.add_argument('-b2','--band2',help='Band 2.',default='z_ap')
-	parser.add_argument('-mcut','--sel_mag_cut',help='Magnitude cut to apply to selection band.',default=None,type=float)
-	parser.add_argument('-b1cut','--band1_mag_cut',help='Magnitude cut to apply to band 1.',default=None,type=float)
-	parser.add_argument('-b2cut','--band2_mag_cut',help='Magnitude cut to apply to band 2.',default=None,type=float)
+	parser.add_argument('-mcut','--sel_mag_cut',help='Magnitude cut to apply to selection band.',default=24.8,type=float)
+	parser.add_argument('-b1cut','--band1_mag_cut',help='Magnitude cut to apply to band 1.',default=99,type=float)
+	parser.add_argument('-b2cut','--band2_mag_cut',help='Magnitude cut to apply to band 2.',default=99,type=float)
 	opts=parser.parse_args()
 	
 	####################
 	# Check inputs
 	####################
-	if type(opts.nside) is not list:
-		opts.nside=[opts.nside]
-	
 	if opts.zbins is None:
 		opts.zbins=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]]
 	else:
@@ -60,8 +57,9 @@ def main():
 	####################
 	# Dust vector
 	####################
-	main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins)
-		
+	main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
+							mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
+							dusted=False,multithread=opts.multithread)
 	####################
 	# Pixelate data
 	####################
@@ -71,17 +69,21 @@ def main():
 	####################
 	# Dust vector
 	####################
-	main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,dusted=True)
+	dust_vector=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
+										mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
+										dusted=True,multithread=opts.multithread)
 	
 	####################
 	# Pixel properties
 	####################
-	pnames=main_func.pixel_stat(fnames,opts.nside,opts.sel_band,opts.band1,opts.band2,opts.zbins,border_check=opts.border_check,multithread=opts.multithread)
+	pnames=main_func.pixel_stat(fnames,opts.nside,opts.sel_band,opts.band1,opts.band2,opts.zbins,
+								mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
+								border_check=opts.border_check,multithread=opts.multithread)
 	
 	####################
 	# Dust map
 	####################
-	#main_func.dust_mapping(pnames)
+	main_func.dust_mapping(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
 
 if __name__ == '__main__':
 	main()
