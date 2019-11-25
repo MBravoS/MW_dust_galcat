@@ -63,7 +63,7 @@ def test(file_path):
 ########################################
 # Read the DESI LC made with GALFORM
 ########################################
-def desi(file_path):
+def desi(in_path,out_path):
 	import numpy as np
 	import pandas as pd
 	import healpy.pixelfunc as pf
@@ -72,7 +72,7 @@ def desi(file_path):
 	# Reading CSV
 	####################
 	var_names=['id_galaxy_sam','id_galaxy_sky','zcos','zobs','BCDM','ra','dec','u_ap','u_ab','g_ap','g_ab','r_ap','r_ab','i_ap','i_ab','z_ap','z_ab']
-	data=pd.read_csv(f'{file_path}DESI.csv',header=None,names=var_names)
+	data=pd.read_csv(f'{in_path}DESI.csv',header=None,names=var_names)
 	data=data.drop(columns=['id_galaxy_sam','zcos','BCDM'])
 	big_pixels=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
 	big_pixel_ID=np.unique(big_pixels)
@@ -82,7 +82,7 @@ def desi(file_path):
 	####################
 	fnames=[]
 	for pix in big_pixel_ID:
-		fname=f'{file_path}galaxies_test_{pix}.csv'
+		fname=f'{out_path}galaxies_GALFORM_{pix}.csv'
 		fnames.append(fname)
 		data_subset=data.loc[big_pixels==pix]
 		data_subset.to_csv(fname,index=False)
@@ -92,7 +92,7 @@ def desi(file_path):
 ########################################
 # Read the LSST LC made with Buzzard
 ########################################
-def lsst(file_path):
+def lsst(in_path,out_path):
 	import numpy as np
 	import pandas as pd
 	from astropy import table
@@ -102,7 +102,7 @@ def lsst(file_path):
 	####################
 	# FITS function
 	####################
-	def fits2csv(fits_name,data_dir,lc)
+	def fits2csv(fits_name,data_dir,lc):
 		hdulist=fits.open(fits_name)
 		tbdata=hdulist[1].data
 		ra=tbdata['RA']
@@ -113,35 +113,30 @@ def lsst(file_path):
 		d={'redshift, cosmological' : z.astype('float64'),
 		'ra' : ra.astype('float64'),
 		'dec' : dec.astype('float64'),
-		'LSST u-band, absolute' : absmag[:,0].astype('float64'),
-		'LSST g-band, absolute' : absmag[:,1].astype('float64'),
-		'LSST r-band, absolute' : absmag[:,2].astype('float64'),
-		'LSST i-band, absolute' : absmag[:,3].astype('float64'),
-		'LSST z-band, absolute' : absmag[:,4].astype('float64'),
-		'LSST u-band, apparent' : appmag[:,0].astype('float64'),
-		'LSST g-band, apparent' : appmag[:,1].astype('float64'),
-		'LSST r-band, apparent' : appmag[:,2].astype('float64'),
-		'LSST i-band, apparent' : appmag[:,3].astype('float64'),
-		'LSST z-band, apparent' : appmag[:,4].astype('float64')}
+		'u_ab' : absmag[:,0].astype('float64'),
+		'g_ab' : absmag[:,1].astype('float64'),
+		'r_ab' : absmag[:,2].astype('float64'),
+		'i_ab' : absmag[:,3].astype('float64'),
+		'z_ab' : absmag[:,4].astype('float64'),
+		'u_ap' : appmag[:,0].astype('float64'),
+		'g_ap' : appmag[:,1].astype('float64'),
+		'r_ap' : appmag[:,2].astype('float64'),
+		'i_ap' : appmag[:,3].astype('float64'),
+		'z_ap' : appmag[:,4].astype('float64')}
 		fit_table=table.Table(d)
 		data=fit_table.to_pandas()
 		hdulist.close()
-		big_pixels=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
-		pixel_list=np.unique(big_pixels)
-		
-		return(data,zm_cut,sigma_cuts,big_pixels,pixel_list)
-	
-	
-	
+		big_pixel=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
+		big_pixel=np.unique(big_pixel)[0]
+		data.to_csv(f'{out_path}galaxies_Buzzard_{big_pixel}.csv',index=False)
+		return(f'{out_path}galaxies_Buzzard_{big_pixel}.csv')
 	
 	####################
 	# Reading FITS
 	####################
-	fits_list=glob.glob(f'{file_path}*.fit')
+	fits_list=glob.glob(f'{in_path}*.fit')
 	pool=mp.Pool(processes=min(56,len(fits_list)))
-	csv_out=[pool1.apply(base.fits2csv,(f,data_dir,lc,mag_cut,band_cut,z_cut,bands,[band_1,band_2],sigma,sigma_cut,)) for f in fits_list]
-	data=pd.concat([f[0] for f in csv_out],ignore_index=True)
-	zm_cut=np.concatenate([f[1] for f in csv_out])
-	sigma_cuts=np.concatenate([f[2] for f in csv_out])
-	big_pixels=np.concatenate([f[3] for f in csv_out])
-	big_pixel_ID=np.unique(np.concatenate([f[4] for f in csv_out]))
+	csv_out=[pool.apply_async(fits2csv,(f,out_path,)) for f in fits_list]
+	csv_out=[c.get() for c in csv_out]
+	
+	return(csv_out)
