@@ -8,10 +8,10 @@
 
 ##########################
 
-rm /fast_scratch2/mbravo/MWdust_data/*test* /fast_scratch2/mbravo/MWdust_plots/*test*
+#rm /fast_scratch2/mbravo/MWdust_data/*test* /fast_scratch2/mbravo/MWdust_plots/*test*
 cd /home/mbravo/MW_dust_galcat
 
-D=test
+D=desi
 P=True
 O=/fast_scratch2/mbravo/MWdust_data/
 PLT=/fast_scratch2/mbravo/MWdust_plots/
