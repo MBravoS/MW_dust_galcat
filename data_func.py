@@ -74,7 +74,7 @@ def desi(lc,band_1,band_2,test=False,mag_cut=None,band_cut=None,z_cut=None,sigma
 	var_names=['id_galaxy_sam','id_galaxy_sky','zcos','zobs','BCDM','ra','dec','u_ap','u_ab','g_ap','g_ab','r_ap','r_ab','i_ap','i_ab','z_ap','z_ab']
 	data=pd.read_csv('/fast_scratch1/mbravo/DESI/'+lc+'.csv',header=None,names=var_names)
 	data=data.drop(columns=['id_galaxy_sam','zcos','BCDM'])
-	big_pixels=pf.ang2pix(32,data['ra'],data['dec'],nest=nested,lonlat=True)
+	big_pixels=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
 	big_pixel_ID=np.unique(big_pixels)
 	
 	####################
