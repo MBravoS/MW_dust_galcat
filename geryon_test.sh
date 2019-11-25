@@ -17,6 +17,6 @@ O=/fast_scratch2/mbravo/MWdust_data/
 PLT=/fast_scratch2/mbravo/MWdust_plots/
 BC=True
 SM=True
-M=True
+M=56
 
 python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $O -bc $BC -sm $SM -m $M
