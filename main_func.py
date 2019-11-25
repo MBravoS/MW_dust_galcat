@@ -1,7 +1,12 @@
 '''Here are the core functions for the map analysis'''
+########################################
+# Dust map recovery
+########################################
+def dust_mapping(pnames):
+	print(pnames)
 
 ########################################
-# Data characterization
+# Dust vector calculation
 ########################################
 def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range,mag_cut=24.8,b1_cut=99,b2_cut=99,dusted=False,multithread=False):
 	import aux_func
@@ -71,10 +76,11 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,z_range,mag_cut=
 		mag.append(vector_comp[i]['mag'])
 		col.append(vector_comp[i]['col'])
 		zstr=f'{(z_range[i][0]+z_range[i][1])/2:.2f}'.translate({ord(c): None for c in '.'})
+		csv_name=f'{data_dir}dust_vector_{run_name}_z{zstr}_nodust.csv'
 		if dusted:
-			vector_comp[i].to_csv(f'{data_dir}dust_vector_{run_name}_z{zstr}.csv',index=False)
-	if dusted:
-		print('Dust vectors saved')
+			csv_name=csv_name.replace('nodust','dusted')
+		vector_comp[i].to_csv(csv_name,index=False)
+	print('Dust vectors saved')
 	
 	####################
 	# Plots
@@ -114,7 +120,7 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	####################
 	print('Reading Schlegel map')
 	if simple_ebv:
-		ebv_map=[np.linspace(-1.1,1.2,pf.nside2npix(n)) for n in nside]
+		ebv_map=[np.linspace(0,0.2,pf.nside2npix(n)) for n in nside]
 	else:
 		ebv_map=[aux_func.sfd_map(percent=False,resample=n,lsst_footprint=False) for n in nside]
 	
@@ -167,3 +173,4 @@ def pixel_stat(fnames,nside,band_sel,band_1,band_2,z_range,mag_cut=24.8,b1_cut=9
 	else:
 		results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,z_range,border_check) for f in fnames]
 	print('Statistics ready')
+	return(sorted(results))

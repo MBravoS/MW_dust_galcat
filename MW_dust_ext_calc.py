@@ -69,7 +69,12 @@ def main():
 	####################
 	# Pixel properties
 	####################
-	main_func.pixel_stat(fnames,opts.nside,'u_ap','u_ap','z_ap',opts.zbins,border_check=opts.border_check,multithread=opts.multithread)
+	pnames=main_func.pixel_stat(fnames,opts.nside,'u_ap','u_ap','z_ap',opts.zbins,border_check=opts.border_check,multithread=opts.multithread)
+	
+	####################
+	# Dust map
+	####################
+	#main_func.dust_mapping(pnames)
 
 if __name__ == '__main__':
 	main()

@@ -162,6 +162,7 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 			missing=L-len(pixel_df[k])
 			pixel_df[k]=np.concatenate([pixel_df[k],np.array([None]*missing)])
 	pd.DataFrame(pixel_df).to_csv(fname.replace('galaxies','pixel'),index=False)
+	return(fname.replace('galaxies','pixel'))
 
 ########################################
 # Read in the Schlegel map
