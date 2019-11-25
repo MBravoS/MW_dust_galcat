@@ -63,7 +63,7 @@ def test(file_path):
 ########################################
 # Read the DESI LC made with GALFORM
 ########################################
-def desi(lc,band_1,band_2,test=False,mag_cut=None,band_cut=None,z_cut=None,sigma_cut=False,nested=False):
+def desi(file_path):
 	import numpy as np
 	import pandas as pd
 	import healpy.pixelfunc as pf
@@ -72,7 +72,7 @@ def desi(lc,band_1,band_2,test=False,mag_cut=None,band_cut=None,z_cut=None,sigma
 	# Reading CSV
 	####################
 	var_names=['id_galaxy_sam','id_galaxy_sky','zcos','zobs','BCDM','ra','dec','u_ap','u_ab','g_ap','g_ab','r_ap','r_ab','i_ap','i_ab','z_ap','z_ab']
-	data=pd.read_csv('/fast_scratch1/mbravo/DESI/'+lc+'.csv',header=None,names=var_names)
+	data=pd.read_csv(f'{file_path}DESI.csv',header=None,names=var_names)
 	data=data.drop(columns=['id_galaxy_sam','zcos','BCDM'])
 	big_pixels=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
 	big_pixel_ID=np.unique(big_pixels)
@@ -88,3 +88,60 @@ def desi(lc,band_1,band_2,test=False,mag_cut=None,band_cut=None,z_cut=None,sigma
 		data_subset.to_csv(fname,index=False)
 	print('DESI/GALFORM data splitted')
 	return(fname)
+
+########################################
+# Read the LSST LC made with Buzzard
+########################################
+def lsst(file_path):
+	import numpy as np
+	import pandas as pd
+	from astropy import table
+	from astropy.io import fits
+	import healpy.pixelfunc as pf
+	
+	####################
+	# FITS function
+	####################
+	def fits2csv(fits_name,data_dir,lc)
+		hdulist=fits.open(fits_name)
+		tbdata=hdulist[1].data
+		ra=tbdata['RA']
+		dec=tbdata['DEC']
+		z=tbdata['Z']
+		absmag=tbdata['AMAG']
+		appmag=tbdata['OMAG']
+		d={'redshift, cosmological' : z.astype('float64'),
+		'ra' : ra.astype('float64'),
+		'dec' : dec.astype('float64'),
+		'LSST u-band, absolute' : absmag[:,0].astype('float64'),
+		'LSST g-band, absolute' : absmag[:,1].astype('float64'),
+		'LSST r-band, absolute' : absmag[:,2].astype('float64'),
+		'LSST i-band, absolute' : absmag[:,3].astype('float64'),
+		'LSST z-band, absolute' : absmag[:,4].astype('float64'),
+		'LSST u-band, apparent' : appmag[:,0].astype('float64'),
+		'LSST g-band, apparent' : appmag[:,1].astype('float64'),
+		'LSST r-band, apparent' : appmag[:,2].astype('float64'),
+		'LSST i-band, apparent' : appmag[:,3].astype('float64'),
+		'LSST z-band, apparent' : appmag[:,4].astype('float64')}
+		fit_table=table.Table(d)
+		data=fit_table.to_pandas()
+		hdulist.close()
+		big_pixels=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
+		pixel_list=np.unique(big_pixels)
+		
+		return(data,zm_cut,sigma_cuts,big_pixels,pixel_list)
+	
+	
+	
+	
+	####################
+	# Reading FITS
+	####################
+	fits_list=glob.glob(f'{file_path}*.fit')
+	pool=mp.Pool(processes=min(56,len(fits_list)))
+	csv_out=[pool1.apply(base.fits2csv,(f,data_dir,lc,mag_cut,band_cut,z_cut,bands,[band_1,band_2],sigma,sigma_cut,)) for f in fits_list]
+	data=pd.concat([f[0] for f in csv_out],ignore_index=True)
+	zm_cut=np.concatenate([f[1] for f in csv_out])
+	sigma_cuts=np.concatenate([f[2] for f in csv_out])
+	big_pixels=np.concatenate([f[3] for f in csv_out])
+	big_pixel_ID=np.unique(np.concatenate([f[4] for f in csv_out]))

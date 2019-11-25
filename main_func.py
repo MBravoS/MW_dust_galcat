@@ -164,7 +164,7 @@ def pixel_stat(fnames,nside,band_sel,band_1,band_2,z_range,mag_cut=24.8,b1_cut=9
 	print('Calculating pixelised properties')
 	if multithread:
 		pool=mp.Pool(processes=min(multithread,len(fnames)))
-		results=[pool.apply_async(aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,z_range,border_check,)) for f in fnames]
+		results=[pool.apply_async(aux_func.pix_stat,(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,z_range,border_check,)) for f in fnames]
 		results=[r.get() for r in results]
 		pool.close()
 	else:
