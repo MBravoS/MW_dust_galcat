@@ -1,11 +1,10 @@
 #!/bin/bash
 #PBS -V
 #PBS -N MWdust_test
+#PBS -k eo
 #PBS -l nodes=1:ppn=56
 #PBS -l walltime=02:00:00
 #PBS -q newton
-#PBS -e /home/mbravo/MW_dust_galcat/test_error.txt
-#PBS -o /home/mbravo/MW_dust_galcat/test_output.txt
 
 ##########################
 
