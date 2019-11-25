@@ -51,6 +51,7 @@ def main():
 	####################
 	# Prepare data
 	####################
+	path_dict={'desi':'/fast_scratch1/mbravo/DESI/','lsst':'/fast_scratch1/mbravo/LSST/'}
 	if opts.prepare_data:
 		fnames=getattr(data_func,opts.data_files)(opts.data_files,opts.out_dir)
 	else:
