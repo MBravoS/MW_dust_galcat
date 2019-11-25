@@ -52,7 +52,7 @@ def main():
 	# Prepare data
 	####################
 	if opts.prepare_data:
-		fnames=getattr(data_func,opts.data_files)(opts.out_dir)
+		fnames=getattr(data_func,opts.data_files)(opts.data_files,opts.out_dir)
 	else:
 		fnames=glob.glob(f'{opts.in_dir}/galaxies_{opts.data_files}*csv')
 	

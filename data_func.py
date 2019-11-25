@@ -7,7 +7,7 @@ bands for the photometry'''
 ########################################
 # Create a simple test mock
 ########################################
-def test(file_path):
+def test(temp,file_path):
 	import os
 	import numpy as np
 	import pandas as pd
