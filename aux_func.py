@@ -121,11 +121,11 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 			####################
 			data_sel=data_full.loc[(data_full['zobs']>z[0])&(data_full['zobs']<z[1])].copy()
 			if bcheck:
-				print(bcheck)
 				print('Enforcing borders')
+				n_nonborder=np.sum(~data_sel[f'{nside_key}_border'])
 				data_sel=data_sel.loc[~data_sel[f'{nside_key}_border']]
 			
-			if np.sum(data_sel)>0:
+			if n_nonborder>0:
 				####################
 				# Add extinction
 				####################
