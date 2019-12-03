@@ -3,21 +3,70 @@
 # Dust map recovery
 ########################################
 def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
+	import aux_func
 	import numpy as np
 	import pandas as pd
-	import matplotlib.cm as cm
+	import splotch as sp
 	import matplotlib.pyplot as plot
 	
-	data=pd.concat(pd.read_csv(p) for p in pnames)
 	for i in range(len(nside)):
 		ns=nside[i]
-		nside_key=f'nside_{np.log2(ns):.0f}'
+		nside_key=f'n{np.log2(ns):.0f}'
+		data=pd.concat([pd.read_csv(p) for p in pnames if nside_key in p],ignore_index=True)
+		EBV_recovery=[]
+		z_label=[]
 		for j in range(len(zrange)):
 			zr=zrange[j]
 			z_key=f'z{np.sum(zr)/2:.2f}'.replace('.','')
-			data[f'{nside_key}_{z_key}_delta']=data[f'{nside_key}_{z_key}_count']+np.random.uniform(-0.5,0.5,len(data))
-			data[f'{nside_key}_{z_key}_delta']=np.log10(data[f'{nside_key}_{z_key}_delta']/np.mean(data[f'{nside_key}_{z_key}_delta']))
 			
+			####################
+			# Delta calc
+			####################
+			delta=data[f'{nside_key}_{z_key}_count']+np.random.uniform(-0.5,0.5,len(data))
+			data[f'{nside_key}_{z_key}_delta']=np.log10(delta/np.mean(delta))
+			
+			####################
+			# Read dust vector
+			####################
+			dust_vector=pd.read_csv(f'{out_dir}dust_vector_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}_dusted.csv')
+			ebv=dust_vector['EBV']
+			ebv2d,ebv2m,ebv2c=aux_func.slope(dust_vector)
+			ebv_from_delta=(data[f'{nside_key}_{z_key}_delta']-np.max(data[f'{nside_key}_{z_key}_delta']))/ebv2d
+			ebv_from_mag=(data[f'{nside_key}_{z_key}_mag']-np.min(data[f'{nside_key}_{z_key}_mag']))/ebv2m
+			ebv_from_col=(data[f'{nside_key}_{z_key}_col']-np.min(data[f'{nside_key}_{z_key}_col']))/ebv2c
+			ebv_recover=np.zeros(len(ebv_from_delta))
+			for k in range(len(ebv_from_delta)):
+				ebv_recover[k]=np.dot([ebv_from_delta[k],ebv_from_mag[k],ebv_from_col[k]],[1,1,1])/(3**0.5)
+			#ebv_from_delta=(data[f'{nside_key}_{z_key}_delta']-np.max(data[f'{nside_key}_{z_key}_delta']))
+			#ebv_from_mag=(data[f'{nside_key}_{z_key}_mag']-np.min(data[f'{nside_key}_{z_key}_mag']))
+			#ebv_from_col=(data[f'{nside_key}_{z_key}_col']-np.min(data[f'{nside_key}_{z_key}_col']))
+			#ebv_recover=np.zeros(len(ebv_from_delta))
+			#for k in range(len(ebv_from_delta)):
+			#	ebv_recover[k]=np.dot([ebv_from_delta[k],ebv_from_mag[k],ebv_from_col[k]],[ebv2d,ebv2m,ebv2c])/(ebv2d**2+ebv2m**2+ebv2c**2)**0.5
+			#print((ebv2d**2+ebv2m**2+ebv2c**2)**0.5)
+			#ebv_recover/=3.3
+			
+			#ebv_recover+=np.min(data[f'{nside_key}_EBV'])-np.min(ebv_recover)
+			EBV_recovery.append(ebv_recover)
+			z_label.append(z_key)
+		
+		####################
+		# Plots
+		####################
+		plot.figure()
+		
+		for j in range(len(zrange)):
+			sp.scatter(data[f'{nside_key}_EBV'],EBV_recovery[j]+np.min(data[f'{nside_key}_EBV']),plabel=z_label[j],c=f'C{j}',
+						xlabel='$E(B-V)_\mathrm{input}$',ylabel='$E(B-V)_\mathrm{recovered}$')
+		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
+		plot.savefig(f'{plot_dir}ebv_recovery_zbin.pdf')
+		plot.figure()
+		
+		for j in range(len(zrange)):
+			sp.scatter(data[f'{nside_key}_EBV']-np.min(data[f'{nside_key}_EBV']),EBV_recovery[j],plabel=z_label[j],c=f'C{j}',
+						xlabel='$\Delta E(B-V)_\mathrm{input}$',ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
+		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
+		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin.pdf')
 
 ########################################
 # Dust vector calculation
@@ -46,7 +95,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 		fd+='_dusted'
 		sfd_key=[k for k in data.columns.values if 'SFD' in k]
 		if len(sfd_key)>1:
-			sfd_nside=np.array([int(s.split('_')[1]) for s in sfd_key])
+			sfd_nside=np.array([int(s.split('_')[0][1:]) for s in sfd_key])
 			maxfound=False
 			j=0
 			while not maxfound:
@@ -54,7 +103,6 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 					maxfound=True
 				else:
 					j+=1
-			print(sfd_nside==np.max(sfd_nside))
 			sfd_key=sfd_key[np.arange(len(sfd_key))[sfd_nside==np.max(sfd_nside)][0]]
 			ebv=data[sfd_key]
 		else:
@@ -93,6 +141,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 		csv_name=f'{data_dir}dust_vector_{run_name}_z{zstr}_nodust.csv'
 		if dusted:
 			csv_name=csv_name.replace('nodust','dusted')
+		vector_comp[i]['EBV']=EBV
 		vector_comp[i].to_csv(csv_name,index=False)
 	print('Dust vectors saved')
 	
@@ -187,5 +236,6 @@ def pixel_stat(fnames,nside,band_sel,band_1,band_2,zrange,mag_cut=24.8,b1_cut=99
 		pool.close()
 	else:
 		results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check) for f in fnames]
+	results=[r2 for r1 in results for r2 in r1]
 	print('Statistics ready')
 	return(sorted(results))

@@ -91,7 +91,7 @@ def pix_id(fname,nside,sfd_map):
 	col_names=[]
 	pix_ids=[]
 	for i in range(len(nside)):
-		col_name=f'nside_{np.log2(nside[i]):.0f}'
+		col_name=f'n{np.log2(nside[i]):.0f}'
 		col_names.append(col_name)
 		pix=pf.ang2pix(nside[i],csv_data['ra'],csv_data['dec'],nest=False,lonlat=True)
 		csv_data[col_name]=pix
@@ -109,10 +109,11 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 	import scipy.stats as stats
 	
 	data_full=pd.read_csv(fname)
-	pixel_df={}
+	pixel_name=[]
 	
 	for ns in nside:
-		nside_key=f'nside_{np.log2(ns):.0f}'
+		pixel_df={}
+		nside_key=f'n{np.log2(ns):.0f}'
 		for z in zr:
 			z_key=f'z{np.sum(z)/2:.2f}'.replace('.','')
 			####################
@@ -120,6 +121,8 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 			####################
 			data_sel=data_full.loc[(data_full['zobs']>z[0])&(data_full['zobs']<z[1])].copy()
 			if bcheck:
+				print(bcheck)
+				print('Enforcing borders')
 				data_sel=data_sel.loc[~data_sel[f'{nside_key}_border']]
 			
 			####################
@@ -154,16 +157,11 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 			pixel_df[f'{nside_key}_{z_key}_count']=counts
 			pixel_df[f'{nside_key}_{z_key}_mag']=mag
 			pixel_df[f'{nside_key}_{z_key}_col']=col
+			pname=fname.replace('galaxies',f'pixel_{nside_key}')
+			pd.DataFrame(pixel_df).to_csv(pname,index=False)
+			pixel_name.append(pname)
 	
-	L=0
-	for k in pixel_df.keys():
-		L=max(L,len(pixel_df[k]))
-	for k in pixel_df.keys():
-		if len(pixel_df[k])<L:
-			missing=L-len(pixel_df[k])
-			pixel_df[k]=np.concatenate([pixel_df[k],np.array([None]*missing)])
-	pd.DataFrame(pixel_df).to_csv(fname.replace('galaxies','pixel'),index=False)
-	return(fname.replace('galaxies','pixel'))
+	return(pixel_name)
 
 ########################################
 # Read in the Schlegel map
@@ -196,3 +194,19 @@ def sfd_map(path='./',percent=True,resample=None,lsst_footprint=True):
 		return(percentiles)
 	else:
 		return(map_data)
+
+########################################
+# Fit the dust vector as function of EBV
+########################################
+def slope(dust_comp):
+	import numpy as np
+	import scipy.optimize as opti
+	
+	def err(a,x,y):
+		return abs(np.mean(a*x-y))
+	
+	md=opti.leastsq(err,0,args=(dust_comp['EBV'],dust_comp['delta']))[0][0]
+	mm=opti.leastsq(err,0,args=(dust_comp['EBV'],dust_comp['mag']))[0][0]
+	mc=opti.leastsq(err,0,args=(dust_comp['EBV'],dust_comp['col']))[0][0]
+	
+	return(md,mm,mc)

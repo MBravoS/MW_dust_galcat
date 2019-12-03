@@ -14,16 +14,23 @@ import main_func
 ########################################
 # Main code
 ########################################
+def s2b(s):
+	import distutils.util as u
+	
+	b=bool(u.strtobool(s))
+	return(b)
+
 def main():
 	parser=argparse.ArgumentParser()
 	parser.add_argument('-d','--data_files',help='The galaxy catalogue to use. By default creates a simple test dataset.',default='test')
-	parser.add_argument('-p','--prepare_data',help='The function from aux_func to copy the data into the file scheme that the code uses.',default=False)
+	parser.add_argument('-p','--prepare_data',help='The function from aux_func to copy the data into the file scheme that the code uses.',
+						default=False,type=s2b)
 	parser.add_argument('-i','--in_dir',help='The input folder.',default='./')
 	parser.add_argument('-o','--out_dir',help='The output folder.',default='./')
 	parser.add_argument('-plt','--plot_dir',help='The plot folder.',default='./')
 	parser.add_argument('-m','--multithread',help='The number of threads for parallelisation.',default=None,type=int)
-	parser.add_argument('-bc','--border_check',help='Keep or discard border pixels.',default=False)
-	parser.add_argument('-sm','--simple_dust_map',help='Test recovery of homogeneous E(B-V)=0.1 map.',default=False)
+	parser.add_argument('-bc','--border_check',help='Keep or discard border pixels.',default=False,type=s2b)
+	parser.add_argument('-sm','--simple_dust_map',help='Test recovery of homogeneous E(B-V)=0.1 map.',default=False,type=s2b)
 	parser.add_argument('-n','--nside',help='HEALPix nside to be used for the map recovery.',default=[64],nargs='+',type=int)
 	parser.add_argument('-z','--zbins',help='Bin edges for the redshift bins.',default=None,nargs='+',type=float)
 	parser.add_argument('-ms','--sel_band',help='Selection band.',default='r_ap')
