@@ -236,6 +236,6 @@ def pixel_stat(fnames,nside,band_sel,band_1,band_2,zrange,mag_cut=24.8,b1_cut=99
 		pool.close()
 	else:
 		results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check) for f in fnames]
-	results=[r2 for r1 in results for r2 in r1]
+	results=[r2 for r1 in results for r2 in r1 if r2 is not None]
 	print('Statistics ready')
 	return(sorted(results))

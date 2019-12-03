@@ -125,41 +125,44 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				print('Enforcing borders')
 				data_sel=data_sel.loc[~data_sel[f'{nside_key}_border']]
 			
-			####################
-			# Add extinction
-			####################
-			A1,E12=extinction_law(data_sel[f'{nside_key}_SFDmap'],b1,b2)
-			Asel,temp=extinction_law(data_sel[f'{nside_key}_SFDmap'],bsel,b2)
-			A2=A1-E12
-			
-			data_sel[bsel]+=Asel
-			data_sel[b1]+=A1
-			data_sel[b2]+=A2
-			
-			mag_sel=data_sel[bsel]<mcut
-			mag_sel&=data_sel[b1]<b1cut
-			mag_sel&=data_sel[b2]<b2cut
-			
-			data_sel=data_sel.loc[mag_sel]
-			
-			####################
-			# Pixel values
-			####################
-			bin_id,bin_id_pos,counts=np.unique(data_sel[nside_key],return_counts=True,return_inverse=True)
-			histogram_bins=np.array([b-0.5 for b in bin_id]+[bin_id[-1]+0.5])
-			
-			mag=stats.binned_statistic(data_sel[nside_key],data_sel[b1],statistic='median',bins=histogram_bins)[0]
-			col=stats.binned_statistic(data_sel[nside_key],data_sel[b1]-data_sel[b2],statistic='median',bins=histogram_bins)[0]
-			ebv=stats.binned_statistic(data_sel[nside_key],data_sel[f'{nside_key}_SFDmap'],statistic='median',bins=histogram_bins)[0]
-			
-			pixel_df[f'{nside_key}_pixID']=bin_id
-			pixel_df[f'{nside_key}_EBV']=ebv
-			pixel_df[f'{nside_key}_{z_key}_count']=counts
-			pixel_df[f'{nside_key}_{z_key}_mag']=mag
-			pixel_df[f'{nside_key}_{z_key}_col']=col
-			pname=fname.replace('galaxies',f'pixel_{nside_key}')
-			pd.DataFrame(pixel_df).to_csv(pname,index=False)
-			pixel_name.append(pname)
+			if np.sum(data_sel)>0:
+				####################
+				# Add extinction
+				####################
+				A1,E12=extinction_law(data_sel[f'{nside_key}_SFDmap'],b1,b2)
+				Asel,temp=extinction_law(data_sel[f'{nside_key}_SFDmap'],bsel,b2)
+				A2=A1-E12
+				
+				data_sel[bsel]+=Asel
+				data_sel[b1]+=A1
+				data_sel[b2]+=A2
+				
+				mag_sel=data_sel[bsel]<mcut
+				mag_sel&=data_sel[b1]<b1cut
+				mag_sel&=data_sel[b2]<b2cut
+				
+				data_sel=data_sel.loc[mag_sel]
+				
+				####################
+				# Pixel values
+				####################
+				bin_id,bin_id_pos,counts=np.unique(data_sel[nside_key],return_counts=True,return_inverse=True)
+				histogram_bins=np.array([b-0.5 for b in bin_id]+[bin_id[-1]+0.5])
+				
+				mag=stats.binned_statistic(data_sel[nside_key],data_sel[b1],statistic='median',bins=histogram_bins)[0]
+				col=stats.binned_statistic(data_sel[nside_key],data_sel[b1]-data_sel[b2],statistic='median',bins=histogram_bins)[0]
+				ebv=stats.binned_statistic(data_sel[nside_key],data_sel[f'{nside_key}_SFDmap'],statistic='median',bins=histogram_bins)[0]
+				
+				pixel_df[f'{nside_key}_pixID']=bin_id
+				pixel_df[f'{nside_key}_EBV']=ebv
+				pixel_df[f'{nside_key}_{z_key}_count']=counts
+				pixel_df[f'{nside_key}_{z_key}_mag']=mag
+				pixel_df[f'{nside_key}_{z_key}_col']=col
+				pname=fname.replace('galaxies',f'pixel_{nside_key}')
+				pd.DataFrame(pixel_df).to_csv(pname,index=False)
+				pixel_name.append(pname)
+			else:
+				pixel_name.append(None)
 	
 	return(pixel_name)
 
