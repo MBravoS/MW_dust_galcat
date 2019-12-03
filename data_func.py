@@ -87,7 +87,7 @@ def desi(in_path,out_path):
 		data_subset=data.loc[big_pixels==pix]
 		data_subset.to_csv(fname,index=False)
 	print('DESI/GALFORM data splitted')
-	return(fname)
+	return(fnames)
 
 ########################################
 # Read the LSST LC made with Buzzard
