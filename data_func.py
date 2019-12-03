@@ -72,7 +72,7 @@ def desi(in_path,out_path):
 	# Reading CSV
 	####################
 	var_names=['id_galaxy_sam','id_galaxy_sky','zcos','zobs','BCDM','ra','dec','u_ap','u_ab','g_ap','g_ab','r_ap','r_ab','i_ap','i_ab','z_ap','z_ab']
-	data=pd.read_csv(f'{in_path}DESI.csv',header=None,names=var_names)
+	data=pd.read_csv(f'{in_path}DESI_LC.csv',header=None,names=var_names)
 	data=data.drop(columns=['id_galaxy_sam','zcos','BCDM'])
 	big_pixels=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
 	big_pixel_ID=np.unique(big_pixels)
