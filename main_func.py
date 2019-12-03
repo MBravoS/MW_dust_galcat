@@ -59,14 +59,14 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 			sp.scatter(data[f'{nside_key}_EBV'],EBV_recovery[j]+np.min(data[f'{nside_key}_EBV']),plabel=z_label[j],c=f'C{j}',
 						xlabel='$E(B-V)_\mathrm{input}$',ylabel='$E(B-V)_\mathrm{recovered}$')
 		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
-		plot.savefig(f'{plot_dir}ebv_recovery_zbin.pdf')
+		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}.pdf')
 		plot.figure()
 		
 		for j in range(len(zrange)):
 			sp.scatter(data[f'{nside_key}_EBV']-np.min(data[f'{nside_key}_EBV']),EBV_recovery[j],plabel=z_label[j],c=f'C{j}',
 						xlabel='$\Delta E(B-V)_\mathrm{input}$',ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
 		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
-		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin.pdf')
+		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}.pdf')
 
 ########################################
 # Dust vector calculation
