@@ -104,7 +104,7 @@ def lsst(in_path,out_path):
 	####################
 	# FITS function
 	####################
-	def fits2csv(fits_name,data_dir,lc):
+	def fits2csv(fits_name,data_dir):
 		hdulist=fits.open(fits_name)
 		tbdata=hdulist[1].data
 		ra=tbdata['RA']
@@ -137,10 +137,10 @@ def lsst(in_path,out_path):
 	# Reading FITS
 	####################
 	fits_list=glob.glob(f'{in_path}*.fit')
-	#pool=mp.Pool(processes=min(56,len(fits_list)))
-	#csv_out=[pool.apply_async(fits2csv,(f,out_path,)) for f in fits_list]
-	#csv_out=[c.get() for c in csv_out]
-	csv_out=[fits2csv(f,out_path) for f in fits_list]
+	pool=mp.Pool(processes=min(56,len(fits_list)))
+	csv_out=[pool.apply_async(fits2csv,(f,out_path,)) for f in fits_list]
+	csv_out=[c.get() for c in csv_out]
+	#csv_out=[fits2csv(f,out_path) for f in fits_list]
 	for c in csv_out:
 		print(c)
 	
