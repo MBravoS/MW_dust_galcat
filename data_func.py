@@ -98,6 +98,7 @@ def lsst(in_path,out_path):
 	import pandas as pd
 	from astropy import table
 	from astropy.io import fits
+	import multiprocessing as mp
 	import healpy.pixelfunc as pf
 	
 	####################
