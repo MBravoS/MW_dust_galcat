@@ -93,6 +93,7 @@ def desi(in_path,out_path):
 # Read the LSST LC made with Buzzard
 ########################################
 def lsst(in_path,out_path):
+	import glob
 	import numpy as np
 	import pandas as pd
 	from astropy import table
