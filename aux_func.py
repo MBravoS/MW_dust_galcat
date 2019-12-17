@@ -124,6 +124,8 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				print('Enforcing borders')
 				n_nonborder=np.sum(~data_sel[f'{nside_key}_border'])
 				data_sel=data_sel.loc[~data_sel[f'{nside_key}_border']]
+			else:
+				n_nonborder=1
 			
 			if n_nonborder>0:
 				####################
@@ -213,3 +215,22 @@ def slope(dust_comp):
 	mc=opti.leastsq(err,0,args=(dust_comp['EBV'],dust_comp['col']))[0][0]
 	
 	return(md,mm,mc)
+
+def slope2(dust_comp,ebvmap):
+	import numpy as np
+	
+	dust_comp['deltaEBV']=dust_comp['EBV']-np.median(ebvmap)
+	temp=dust_comp.loc[(dust_comp['deltaEBV']>-0.05)&(dust_comp['deltaEBV']<0.05)]
+	max_debv=temp['deltaEBV']==np.max(temp['deltaEBV'])
+	min_debv=temp['deltaEBV']==np.min(temp['deltaEBV'])
+	
+	md=(float(temp.loc[max_debv,'delta'])-float(temp.loc[min_debv,'delta']))/0.1
+	mm=(float(temp.loc[max_debv,'mag'])-float(temp.loc[min_debv,'mag']))/0.1
+	mc=(float(temp.loc[max_debv,'col'])-float(temp.loc[min_debv,'col']))/0.1
+	print(md,mm,mc)
+	
+	dust_comp['delta']/=md
+	dust_comp['mag']/=mm
+	dust_comp['col']/=mc
+	
+	return(dust_comp,md,mm,mc)

@@ -64,9 +64,10 @@ def main():
 	####################
 	# Dust vector
 	####################
-	main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
-							mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
-							dusted=False,multithread=opts.multithread)
+	dust_vector=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
+										mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
+										dusted=False,multithread=opts.multithread)
+	
 	####################
 	# Pixelate data
 	####################
@@ -76,9 +77,9 @@ def main():
 	####################
 	# Dust vector
 	####################
-	dust_vector=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
-										mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
-										dusted=True,multithread=opts.multithread)
+	temp=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
+								mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
+								dusted=True,multithread=opts.multithread)
 	
 	####################
 	# Pixel properties
@@ -90,7 +91,9 @@ def main():
 	####################
 	# Dust map
 	####################
-	main_func.dust_mapping(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
+	#main_func.dust_mapping(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
+	#main_func.dust_mapping2(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
+	main_func.dust_mapping3(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
 
 if __name__ == '__main__':
 	main()

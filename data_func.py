@@ -138,11 +138,10 @@ def lsst(in_path,out_path):
 	####################
 	fits_list=glob.glob(f'{in_path}*.fit')
 	print(fits_list)
-	#pool=mp.Pool(processes=min(56,len(fits_list)))
-	#csv_out=[pool.apply_async(fits2csv,(f,out_path,)) for f in fits_list]
-	#csv_out=[c.get() for c in csv_out]
-	csv_out=[fits2csv(f,out_path) for f in fits_list]
-	for c in csv_out:
-		print(c)
+	pool=mp.Pool(processes=min(56,len(fits_list)))
+	csv_out=[pool.apply(fits2csv,(f,out_path,)) for f in fits_list]
+	#csv_out=[fits2csv(f,out_path) for f in fits_list]
+	#for c in csv_out:
+	#	print(c)
 	
 	return(csv_out)
