@@ -216,21 +216,29 @@ def slope(dust_comp):
 	
 	return(md,mm,mc)
 
-def slope2(dust_comp,ebvmap):
+def slope2(dust_comp,ebvmap,dusted=False):
 	import numpy as np
 	
-	dust_comp['deltaEBV']=dust_comp['EBV']-np.median(ebvmap)
-	temp=dust_comp.loc[(dust_comp['deltaEBV']>-0.05)&(dust_comp['deltaEBV']<0.05)]
+	if dusted:
+		dust_comp['deltaEBV']=dust_comp['EBV']
+		temp=dust_comp.loc[dust_comp['deltaEBV']<0.1]
+	else:
+		dust_comp['deltaEBV']=dust_comp['EBV']-np.median(ebvmap)
+		temp=dust_comp.loc[(dust_comp['deltaEBV']>-0.05)&(dust_comp['deltaEBV']<0.05)]
 	max_debv=temp['deltaEBV']==np.max(temp['deltaEBV'])
 	min_debv=temp['deltaEBV']==np.min(temp['deltaEBV'])
+	cen_debv=np.abs(temp['deltaEBV'])==np.min(np.abs(temp['deltaEBV']))
 	
 	md=(float(temp.loc[max_debv,'delta'])-float(temp.loc[min_debv,'delta']))/0.1
 	mm=(float(temp.loc[max_debv,'mag'])-float(temp.loc[min_debv,'mag']))/0.1
 	mc=(float(temp.loc[max_debv,'col'])-float(temp.loc[min_debv,'col']))/0.1
-	print(md,mm,mc)
 	
-	dust_comp['delta']/=md
-	dust_comp['mag']/=mm
-	dust_comp['col']/=mc
+	#dust_comp['delta']-=float(temp.loc[cen_debv,'delta'])
+	#dust_comp['mag']-=float(temp.loc[cen_debv,'mag'])
+	#dust_comp['col']-=float(temp.loc[cen_debv,'col'])
+	
+	#dust_comp['delta']/=md
+	#dust_comp['mag']/=mm
+	#dust_comp['col']/=mc
 	
 	return(dust_comp,md,mm,mc)

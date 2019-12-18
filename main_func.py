@@ -155,7 +155,7 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		ns=nside[i]
 		nside_key=f'n{np.log2(ns):.0f}'
 		data=pd.concat([pd.read_csv(p) for p in pnames if nside_key in p],ignore_index=True)
-		ebv_from_delta,ebv_from_mag,ebv_from_col=[],[],[]
+		Debv,ebv_from_delta,ebv_from_mag,ebv_from_col=[],[],[],[]
 		z_label=[]
 		for j in range(len(zrange)):
 			zr=zrange[j]
@@ -173,9 +173,27 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 			dust_vector=pd.read_csv(f'{out_dir}dust_vector_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}_dusted.csv')
 			dust_vector,ebv2d,ebv2m,ebv2c=aux_func.slope2(dust_vector,np.array(data[f'{nside_key}_EBV']))
 			
-			ebv_from_delta.append((data[f'{nside_key}_{z_key}_delta']-np.median(data[f'{nside_key}_{z_key}_delta']))/ebv2d)
-			ebv_from_mag.append((data[f'{nside_key}_{z_key}_mag']-np.median(data[f'{nside_key}_{z_key}_mag']))/ebv2m)
-			ebv_from_col.append((data[f'{nside_key}_{z_key}_col']-np.median(data[f'{nside_key}_{z_key}_col']))/ebv2c)
+			#plot.figure()
+			#sp.plot(dust_vector['deltaEBV'],dust_vector['delta'],plabel='$\Delta\log(\delta+1)$')
+			#sp.plot(dust_vector['deltaEBV'],dust_vector['mag'],plabel='$\Delta u$')
+			#sp.plot(dust_vector['deltaEBV'],dust_vector['col'],plabel='$\Delta(u-z)$')
+			##sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
+			##sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
+			##sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
+			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2d,linestyle='dotted',plabel='metric$_\delta$')
+			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2m,linestyle='dotted',plabel='metric$_u$')
+			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2c,linestyle='dotted',plabel='metric$_{u-z}$',
+			#		xlabel='$E(B-V)$ [mag]',ylabel='$\Delta$',xlim=[-0.1,0.1])
+			#plot.tight_layout()
+			#plot.savefig(f'{plot_dir}metric_check_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}.pdf')
+			#plot.close()
+			
+			#Debv.append(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']))
+			Debv.append(data[f'{nside_key}_EBV'])
+			ebv_from_delta.append((data[f'{nside_key}_{z_key}_delta']-np.median(data[f'{nside_key}_{z_key}_delta'])))#/ebv2d)
+			ebv_from_mag.append((data[f'{nside_key}_{z_key}_mag']-np.median(data[f'{nside_key}_{z_key}_mag'])))#/ebv2m)
+			#ebv_from_col.append((data[f'{nside_key}_{z_key}_col']-np.median(data[f'{nside_key}_{z_key}_col'])))#/ebv2c)
+			ebv_from_col.append(data[f'{nside_key}_{z_key}_col'])#/ebv2c)
 			
 			z_label.append(z_key)
 		
@@ -185,16 +203,13 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		plot.figure()
 		
 		for j in range(len(zrange)):
-			sp.scatter(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']),ebv_from_delta[j],
-						plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
-			sp.scatter(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']),ebv_from_mag[j],
-						plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
-			sp.scatter(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']),ebv_from_col[j],
-						plabel=f'$u-z$, {z_label[j]}',c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
+			#sp.scatter(Debv[j],ebv_from_delta[j],plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
+			#sp.scatter(Debv[j],ebv_from_mag[j],plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
+			sp.scatter(Debv[j],ebv_from_col[j],plabel=f'$u-z$, {z_label[j]}',c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
 						ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
 		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
-		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}.pdf')
+		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}.pdf')
 
 ########################################
 # Dust vector calculation
@@ -235,6 +250,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 			ebv=data[sfd_key]
 		else:
 			ebv=np.array(data[sfd_key[0]])
+		print(f'Median E(B-V) applied to mock = {np.nanmedian(ebv):.4f} mag')
 	
 	####################
 	# Extinction effect
@@ -280,6 +296,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	vir=cm.get_cmap('viridis')
 	cr=vir(np.array([i/5.0 for i in range(len(zrange))]))
 	zlabel=[f'$z_{{{z[0]},{z[1]}}}$' for z in zrange]
+	
 	print('Making E(B-V) vs delta/mag/col plot')
 	
 	plot.figure(figsize=[fs[0],fs[1]*3])
@@ -288,10 +305,10 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	sp.plot(EBV,delta,c=cr,ylabel='$\log(\delta+1)$',title=run_name,plabel=zlabel)
 	plot.subplot(3,1,2)
 	sp.plot(EBV,mag,c=cr,ylabel=f'$\Delta {band_1[0]}$ [mag]')
-	sp.plot(EBV[0],A_b1,c='k',linestyle='dotted',plabel=f'A$({band_1[0]})$ [mag]')
+	sp.plot(EBV[0],A_b1,c='k',linestyle='dashed',plabel=f'A$({band_1[0]})$ [mag]')
 	plot.subplot(3,1,3)
 	sp.plot(EBV,col,c=cr,xlabel='E(B-V) [mag]',ylabel=f'$\Delta({band_1[0]}-{band_2[0]})$ [mag]')
-	sp.plot(EBV[0],E_b1b2,c='k',linestyle='dotted',plabel=f'E$({band_1[0]}-{band_2[0]})$ [mag]')
+	sp.plot(EBV[0],E_b1b2,c='k',linestyle='dashed',plabel=f'E$({band_1[0]}-{band_2[0]})$ [mag]')
 	plot.tight_layout()
 	plot.savefig(f'{plot_dir}dust_vector_{run_name}{fd}.pdf')
 	plot.close()
@@ -313,7 +330,7 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	####################
 	print('Reading Schlegel map')
 	if simple_ebv:
-		ebv_map=[np.linspace(0,0.2,pf.nside2npix(n)) for n in nside]
+		ebv_map=[0.1*np.ones(pf.nside2npix(n)) for n in nside]#[np.linspace(0,0.2,pf.nside2npix(n)) for n in nside]
 	else:
 		ebv_map=[aux_func.sfd_map(percent=False,resample=n,lsst_footprint=False) for n in nside]
 	
