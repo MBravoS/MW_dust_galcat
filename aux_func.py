@@ -3,19 +3,18 @@
 ########################################
 # Extinction vector calculation
 ########################################
-def dust_vector(data,band_sel,band_1,band_2,A_sel,A_b1,A_b2,E_b1b2,mag_sel_lim,mag_1_lim,mag_2_lim,ebv_map):
+def dust_vector(data,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag_2_lim,ebv_map):
 	import numpy as np
 	import pandas as pd
 	
-	map_sel,map_A1,map_A2=[0,0,0]
-	if ebv_map is not None:
-		map_A1,map_E12=extinction_law(ebv_map,band_1,band_2)
-		map_sel,temp=extinction_law(ebv_map,band_sel,band_2)
-		map_A2=map_A1-map_E12
 	
-	data[band_sel]+=map_sel
-	data[band_1]+=map_A1
-	data[band_2]+=map_A2
+	mag_filt_list=[k for k in data.columns.values if k[-3:]=='_ap']
+	print(mag_filt_list)
+	
+	if ebv_map is not None:
+		for mfl in mag_filt_list:
+			A_mfl,temp=extinction_law(ebv_map,mfl,band_1)
+			data[mfl]+=A_mfl
 	
 	mag_sel=data[band_sel]<mag_sel_lim
 	mag_sel&=data[band_1]<mag_1_lim
@@ -28,15 +27,19 @@ def dust_vector(data,band_sel,band_1,band_2,A_sel,A_b1,A_b2,E_b1b2,mag_sel_lim,m
 	base_c=np.median(data[band_1]-data[band_2])
 	n_dust,m_dust,c_dust=[[],[],[]]
 	
-	for i in range(len(A_sel)):
-		
-		mag_sel=((data[band_sel]+A_sel[i])<mag_sel_lim)
-		mag_sel&=((data[band_1]+A_b1[i])<mag_1_lim)
-		mag_sel&=((data[band_2]+A_b2[i])<mag_2_lim)
+	for i in range(len(ebv_test)):
+		dusted_data=data.copy()
+		for mfl in mag_filt_list:
+			A_mfl,temp=extinction_law(ebv_test[i],mfl,band_1)
+			dusted_data[mfl]+=A_mfl
+			
+		mag_sel=(dusted_data[band_sel]<mag_sel_lim)
+		mag_sel&=(dusted_data[band_1]<mag_1_lim)
+		mag_sel&=(dusted_data[band_2]<mag_2_lim)
 		
 		new_n=1.0*np.sum(mag_sel)
-		new_mag=np.array(data[band_1]+A_b1[i])[mag_sel]
-		new_col=np.array(data[band_1]-data[band_2]+E_b1b2[i])[mag_sel]
+		new_mag=np.array(dusted_data[band_1])[mag_sel]
+		new_col=np.array(dusted_data[band_1]-dusted_data[band_2])[mag_sel]
 		
 		n_dust.append(np.log10(new_n/base_n))
 		m_dust.append(np.median(new_mag)-base_m)
@@ -131,13 +134,31 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				####################
 				# Add extinction
 				####################
+				
+				#print('-----------------------------------------------')
+				#
+				#print(data_sel[f'{nside_key}_SFDmap'])
+				#print(np.median(data_sel[f'{nside_key}_SFDmap']))
+				#print('')
+				
 				A1,E12=extinction_law(data_sel[f'{nside_key}_SFDmap'],b1,b2)
 				Asel,temp=extinction_law(data_sel[f'{nside_key}_SFDmap'],bsel,b2)
 				A2=A1-E12
 				
-				data_sel[bsel]+=Asel
+				#print(A1,A2,E12)
+				#print('')
+				#
+				#print(data_sel[b1]-data_sel[b2])
+				#print(np.median(data_sel[b1]-data_sel[b2]))
+				#print('')
+				
+				#data_sel[bsel]+=Asel
 				data_sel[b1]+=A1
 				data_sel[b2]+=A2
+				
+				#print(data_sel[b1]-data_sel[b2])
+				#print(np.median(data_sel[b1]-data_sel[b2]))
+				#print('')
 				
 				mag_sel=data_sel[bsel]<mcut
 				mag_sel&=data_sel[b1]<b1cut
@@ -233,9 +254,9 @@ def slope2(dust_comp,ebvmap,dusted=False):
 	mm=(float(temp.loc[max_debv,'mag'])-float(temp.loc[min_debv,'mag']))/0.1
 	mc=(float(temp.loc[max_debv,'col'])-float(temp.loc[min_debv,'col']))/0.1
 	
-	#dust_comp['delta']-=float(temp.loc[cen_debv,'delta'])
-	#dust_comp['mag']-=float(temp.loc[cen_debv,'mag'])
-	#dust_comp['col']-=float(temp.loc[cen_debv,'col'])
+	dust_comp['delta']-=np.mean(temp.loc[cen_debv,'delta'])
+	dust_comp['mag']-=np.mean(temp.loc[cen_debv,'mag'])
+	dust_comp['col']-=np.mean(temp.loc[cen_debv,'col'])
 	
 	#dust_comp['delta']/=md
 	#dust_comp['mag']/=mm

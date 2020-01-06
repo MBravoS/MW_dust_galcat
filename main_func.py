@@ -170,30 +170,42 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 			####################
 			# Read dust vector
 			####################
-			dust_vector=pd.read_csv(f'{out_dir}dust_vector_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}_dusted.csv')
+			dust_vector=pd.read_csv(f'{out_dir}dust_vector_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}_nodust.csv')
 			dust_vector,ebv2d,ebv2m,ebv2c=aux_func.slope2(dust_vector,np.array(data[f'{nside_key}_EBV']))
 			
-			#plot.figure()
-			#sp.plot(dust_vector['deltaEBV'],dust_vector['delta'],plabel='$\Delta\log(\delta+1)$')
-			#sp.plot(dust_vector['deltaEBV'],dust_vector['mag'],plabel='$\Delta u$')
-			#sp.plot(dust_vector['deltaEBV'],dust_vector['col'],plabel='$\Delta(u-z)$')
-			##sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
-			##sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
-			##sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
-			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2d,linestyle='dotted',plabel='metric$_\delta$')
-			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2m,linestyle='dotted',plabel='metric$_u$')
-			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2c,linestyle='dotted',plabel='metric$_{u-z}$',
-			#		xlabel='$E(B-V)$ [mag]',ylabel='$\Delta$',xlim=[-0.1,0.1])
-			#plot.tight_layout()
-			#plot.savefig(f'{plot_dir}metric_check_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}.pdf')
-			#plot.close()
+			plot.figure()
+			sp.plot(dust_vector['deltaEBV'],dust_vector['delta'],plabel='$\Delta\log(\delta+1)$')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['mag'],plabel='$\Delta u$')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['col'],plabel='$\Delta(u-z)$')
+			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
+			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
+			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2d,linestyle='dotted',plabel='metric$_\delta$')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2m,linestyle='dotted',plabel='metric$_u$')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2c,linestyle='dotted',plabel='metric$_{u-z}$',
+					xlabel='$E(B-V)$ [mag]',ylabel='$\Delta$',xlim=[-0.1,0.1])
+			plot.tight_layout()
+			plot.savefig(f'{plot_dir}metric_check_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}.pdf')
+			plot.close()
 			
-			#Debv.append(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']))
-			Debv.append(data[f'{nside_key}_EBV'])
-			ebv_from_delta.append((data[f'{nside_key}_{z_key}_delta']-np.median(data[f'{nside_key}_{z_key}_delta'])))#/ebv2d)
-			ebv_from_mag.append((data[f'{nside_key}_{z_key}_mag']-np.median(data[f'{nside_key}_{z_key}_mag'])))#/ebv2m)
-			#ebv_from_col.append((data[f'{nside_key}_{z_key}_col']-np.median(data[f'{nside_key}_{z_key}_col'])))#/ebv2c)
-			ebv_from_col.append(data[f'{nside_key}_{z_key}_col'])#/ebv2c)
+			Debv.append(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']))
+			#Debv.append(data[f'{nside_key}_EBV'])
+			ebv_from_delta.append((data[f'{nside_key}_{z_key}_delta']-np.median(data[f'{nside_key}_{z_key}_delta']))/ebv2d)
+			ebv_from_mag.append((data[f'{nside_key}_{z_key}_mag']-np.median(data[f'{nside_key}_{z_key}_mag']))/ebv2m)
+			ebv_from_col.append((data[f'{nside_key}_{z_key}_col']-np.median(data[f'{nside_key}_{z_key}_col']))/ebv2c)
+			
+			#print(data[f'{nside_key}_EBV'])
+			#print('')
+			#print(data[f'{nside_key}_{z_key}_col'])
+			#print('')
+			#print(np.median(data[f'{nside_key}_EBV']))
+			#print('')
+			#print(np.median(data[f'{nside_key}_{z_key}_col']))
+			#print('')
+			#print(ebv_from_col[j])
+			#print('')
+			
+			#ebv_from_col.append(data[f'{nside_key}_{z_key}_col'])#/ebv2c)
 			
 			z_label.append(z_key)
 		
@@ -203,10 +215,10 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		plot.figure()
 		
 		for j in range(len(zrange)):
-			#sp.scatter(Debv[j],ebv_from_delta[j],plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
-			#sp.scatter(Debv[j],ebv_from_mag[j],plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
+			sp.scatter(Debv[j],ebv_from_delta[j],plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
+			sp.scatter(Debv[j],ebv_from_mag[j],plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
 			sp.scatter(Debv[j],ebv_from_col[j],plabel=f'$u-z$, {z_label[j]}',c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
-						ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
+						ylabel='$\Delta E(B-V)_\mathrm{recovered}$',alpha=0.2)
 		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}.pdf')
@@ -267,12 +279,10 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	if multithread:
 		pool=mp.Pool(processes=min(multithread,len(A_sel)))
 		vector_comp=[pool.apply(aux_func.dust_vector,(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
-														A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,
-														ebv[(data['zobs']>z[0])&(data['zobs']<z[1])],)) for z in zrange]
+														EBV,mag_cut,b1_cut,b2_cut, ebv[(data['zobs']>z[0])&(data['zobs']<z[1])],)) for z in zrange]
 	else:
 		vector_comp=[aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
-											A_sel,A_b1,A_b2,E_b1b2,mag_cut,b1_cut,b2_cut,
-											ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in zrange]
+											EBV,mag_cut,b1_cut,b2_cut,ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in zrange]
 	
 	delta=[]
 	mag=[]
@@ -330,7 +340,7 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	####################
 	print('Reading Schlegel map')
 	if simple_ebv:
-		ebv_map=[0.1*np.ones(pf.nside2npix(n)) for n in nside]#[np.linspace(0,0.2,pf.nside2npix(n)) for n in nside]
+		ebv_map=[np.linspace(0,0.2,pf.nside2npix(n)) for n in nside]#[0.1*np.ones(pf.nside2npix(n)) for n in nside]
 	else:
 		ebv_map=[aux_func.sfd_map(percent=False,resample=n,lsst_footprint=False) for n in nside]
 	
