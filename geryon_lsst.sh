@@ -8,7 +8,7 @@
 
 ##########################
 
-#rm /fast_scratch2/mbravo/MWdust_data/*test* /fast_scratch2/mbravo/MWdust_plots/*test*
+rm /fast_scratch2/mbravo/MWdust_data/*Buzzard* /fast_scratch2/mbravo/MWdust_plots/*Buzzard*
 cd /home/mbravo/MW_dust_galcat
 
 D=lsst
@@ -18,6 +18,6 @@ PLT=/fast_scratch2/mbravo/MWdust_plots/
 BC=True
 SM=True
 M=56
-MS=u_ap
+MS=r_ap
 
 python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sm $SM -m $M -ms $MS
