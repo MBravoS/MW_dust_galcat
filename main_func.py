@@ -156,7 +156,7 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		nside_key=f'n{np.log2(ns):.0f}'
 		data=pd.concat([pd.read_csv(p) for p in pnames if nside_key in p],ignore_index=True)
 		Debv,ebv_from_delta,ebv_from_mag,ebv_from_col=[],[],[],[]
-		z_label=[]
+		EBV_recovery,z_label=[],[]
 		for j in range(len(zrange)):
 			zr=zrange[j]
 			z_key=f'z{np.sum(zr)/2:.2f}'.replace('.','')
@@ -177,9 +177,6 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 			sp.plot(dust_vector['deltaEBV'],dust_vector['delta'],plabel='$\Delta\log(\delta+1)$')
 			sp.plot(dust_vector['deltaEBV'],dust_vector['mag'],plabel='$\Delta u$')
 			sp.plot(dust_vector['deltaEBV'],dust_vector['col'],plabel='$\Delta(u-z)$')
-			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
-			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
-			#sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV'],linestyle='dotted')
 			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2d,linestyle='dotted',plabel='metric$_\delta$')
 			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2m,linestyle='dotted',plabel='metric$_u$')
 			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2c,linestyle='dotted',plabel='metric$_{u-z}$',
@@ -194,19 +191,21 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 			ebv_from_mag.append((data[f'{nside_key}_{z_key}_mag']-np.median(data[f'{nside_key}_{z_key}_mag']))/ebv2m)
 			ebv_from_col.append((data[f'{nside_key}_{z_key}_col']-np.median(data[f'{nside_key}_{z_key}_col']))/ebv2c)
 			
-			#print(data[f'{nside_key}_EBV'])
-			#print('')
-			#print(data[f'{nside_key}_{z_key}_col'])
-			#print('')
-			#print(np.median(data[f'{nside_key}_EBV']))
-			#print('')
-			#print(np.median(data[f'{nside_key}_{z_key}_col']))
-			#print('')
-			#print(ebv_from_col[j])
-			#print('')
+			spl_delta=interp.UnivariateSpline(dust_vector['deltaEBV'],dust_vector['delta'],ext=0)
+			spl_mag=interp.UnivariateSpline(dust_vector['deltaEBV'],dust_vector['mag'],ext=0)
+			spl_col=interp.UnivariateSpline(dust_vector['deltaEBV'],dust_vector['col'],ext=0)
 			
-			#ebv_from_col.append(data[f'{nside_key}_{z_key}_col'])#/ebv2c)
+			def dist(val,D,M,C):
+				dd=spl_delta(val)
+				mm=spl_mag(val)
+				cc=spl_col(val)
+				return(((D-dd)**2+(M-mm)**2+(C-cc)**2)**0.5)
 			
+			ebv_recover=np.zeros(len(ebv_from_delta[j]))
+			for k in range(len(ebv_from_delta[j])):
+				ebv_recover[k]=opti.minimize(dist,x0=0.0,args=(ebv_from_delta[j][k],ebv_from_mag[j][k],ebv_from_col[j][k])).x
+			
+			EBV_recovery.append(ebv_recover)
 			z_label.append(z_key)
 		
 		####################
@@ -215,10 +214,12 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		plot.figure()
 		
 		for j in range(len(zrange)):
-			sp.scatter(Debv[j],ebv_from_delta[j],plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
-			sp.scatter(Debv[j],ebv_from_mag[j],plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
-			sp.scatter(Debv[j],ebv_from_col[j],plabel=f'$u-z$, {z_label[j]}',c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
-						ylabel='$\Delta E(B-V)_\mathrm{recovered}$',alpha=0.2)
+			sp.scatter(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']),EBV_recovery[j]+0.1,plabel=z_label[j],c=f'C{j}',
+						xlabel='$\Delta E(B-V)_\mathrm{input}$',ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
+			#sp.scatter(Debv[j],ebv_from_delta[j],plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
+			#sp.scatter(Debv[j],ebv_from_mag[j],plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
+			#sp.scatter(Debv[j],ebv_from_col[j],plabel=f'$u-z$, {z_label[j]}',c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
+			#			ylabel='$\Delta E(B-V)_\mathrm{recovered}$',alpha=0.2)
 		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}.pdf')
@@ -312,7 +313,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	plot.figure(figsize=[fs[0],fs[1]*3])
 	
 	plot.subplot(3,1,1)
-	sp.plot(EBV,delta,c=cr,ylabel='$\log(\delta+1)$',title=run_name,plabel=zlabel)
+	sp.plot(EBV,delta,c=cr,ylabel='$\Delta\log(\delta+1)$',title=run_name,plabel=zlabel)
 	plot.subplot(3,1,2)
 	sp.plot(EBV,mag,c=cr,ylabel=f'$\Delta {band_1[0]}$ [mag]')
 	sp.plot(EBV[0],A_b1,c='k',linestyle='dashed',plabel=f'A$({band_1[0]})$ [mag]')

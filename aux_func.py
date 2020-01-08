@@ -9,7 +9,7 @@ def dust_vector(data,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag_2
 	
 	
 	mag_filt_list=[k for k in data.columns.values if k[-3:]=='_ap']
-	print(mag_filt_list)
+	#print(mag_filt_list)
 	
 	if ebv_map is not None:
 		for mfl in mag_filt_list:
