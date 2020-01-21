@@ -30,7 +30,7 @@ def main():
 	parser.add_argument('-plt','--plot_dir',help='The plot folder.',default='./')
 	parser.add_argument('-m','--multithread',help='The number of threads for parallelisation.',default=None,type=int)
 	parser.add_argument('-bc','--border_check',help='Keep or discard border pixels.',default=False,type=s2b)
-	parser.add_argument('-sm','--simple_dust_map',help='Test recovery of homogeneous E(B-V)=0.1 map.',default=False,type=s2b)
+	parser.add_argument('-sdm','--simple_dust_map',help='Test recovery of homogeneous E(B-V)=0.1 map.',default=False,type=s2b)
 	parser.add_argument('-n','--nside',help='HEALPix nside to be used for the map recovery.',default=[64],nargs='+',type=int)
 	parser.add_argument('-z','--zbins',help='Bin edges for the redshift bins.',default=None,nargs='+',type=float)
 	parser.add_argument('-ms','--sel_band',help='Selection band.',default='r_ap')
@@ -66,20 +66,13 @@ def main():
 	####################
 	dust_vector=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
 										mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
-										dusted=False,multithread=opts.multithread)
+										multithread=opts.multithread)
 	
 	####################
 	# Pixelate data
 	####################
 	main_func.pixel_assign(fnames,opts.nside,border_check=opts.border_check,multithread=opts.multithread,
 							simple_ebv=opts.simple_dust_map)
-	
-	####################
-	# Dust vector
-	####################
-	#temp=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
-	#							mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
-	#							dusted=True,multithread=opts.multithread)
 	
 	####################
 	# Pixel properties

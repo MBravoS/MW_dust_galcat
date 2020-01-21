@@ -170,23 +170,22 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 			####################
 			# Read dust vector
 			####################
-			dust_vector=pd.read_csv(f'{out_dir}dust_vector_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}_nodust.csv')
+			dust_vector=pd.read_csv(f'{out_dir}dust_vector_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}.csv')
 			dust_vector,ebv2d,ebv2m,ebv2c=aux_func.slope2(dust_vector,np.array(data[f'{nside_key}_EBV']))
 			
 			plot.figure()
-			sp.plot(dust_vector['deltaEBV'],dust_vector['delta'],plabel='$\Delta\log(\delta+1)$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['mag'],plabel='$\Delta u$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['col'],plabel='$\Delta(u-z)$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2d,linestyle='dotted',plabel='metric$_\delta$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2m,linestyle='dotted',plabel='metric$_u$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2c,linestyle='dotted',plabel='metric$_{u-z}$',
-					xlabel='$E(B-V)$ [mag]',ylabel='$\Delta$',xlim=[-0.1,0.1])
+			sp.plot(dust_vector['deltaEBV'],dust_vector['delta'],plabel='$\log(\delta+1)_\mathrm{measured}$')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['mag'],plabel='$u_\mathrm{measured}$')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['col'],plabel='$(u-z)_\mathrm{measured}$')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2d,linestyle='dotted',plabel='$\delta_\mathrm{fit}$')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2m,linestyle='dotted',plabel='$u_\mathrm{fit}$')
+			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2c,linestyle='dotted',plabel='${u-z}_\mathrm{fit}$',
+					xlabel='$\Delta E(B-V)$ [mag]',ylabel='$\Delta$',xlim=[-0.1,0.1])
 			plot.tight_layout()
 			plot.savefig(f'{plot_dir}metric_check_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}.pdf')
 			plot.close()
 			
 			Debv.append(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']))
-			#Debv.append(data[f'{nside_key}_EBV'])
 			ebv_from_delta.append((data[f'{nside_key}_{z_key}_delta']-np.median(data[f'{nside_key}_{z_key}_delta']))/ebv2d)
 			ebv_from_mag.append((data[f'{nside_key}_{z_key}_mag']-np.median(data[f'{nside_key}_{z_key}_mag']))/ebv2m)
 			ebv_from_col.append((data[f'{nside_key}_{z_key}_col']-np.median(data[f'{nside_key}_{z_key}_col']))/ebv2c)
@@ -199,7 +198,7 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 				dd=spl_delta(val)
 				mm=spl_mag(val)
 				cc=spl_col(val)
-				return(((D-dd)**2+(M-mm)**2+(C-cc)**2)**0.5)
+				return(((D-dd/ebv2d)**2+(M-mm/ebv2m)**2+(C-cc/ebv2c)**2)**0.5)
 			
 			ebv_recover=np.zeros(len(ebv_from_delta[j]))
 			for k in range(len(ebv_from_delta[j])):
@@ -212,22 +211,27 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		# Plots
 		####################
 		plot.figure()
-		
 		for j in range(len(zrange)):
-			sp.scatter(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']),EBV_recovery[j]+0.1,plabel=z_label[j],c=f'C{j}',
-						xlabel='$\Delta E(B-V)_\mathrm{input}$',ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
-			#sp.scatter(Debv[j],ebv_from_delta[j],plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
-			#sp.scatter(Debv[j],ebv_from_mag[j],plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
-			#sp.scatter(Debv[j],ebv_from_col[j],plabel=f'$u-z$, {z_label[j]}',c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
-			#			ylabel='$\Delta E(B-V)_\mathrm{recovered}$',alpha=0.2)
+			sp.scatter(Debv[j],EBV_recovery[j],plabel=z_label[j],c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
+						ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
 		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
-		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}.pdf')
+		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_combined.pdf')
+		
+		plot.figure()
+		for j in range(len(zrange)):
+			sp.scatter(Debv[j],ebv_from_delta[j],plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
+			sp.scatter(Debv[j],ebv_from_mag[j],plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
+			sp.scatter(Debv[j],ebv_from_col[j],plabel=f'$u-z$, {z_label[j]}',c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
+						ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
+		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
+		plot.tight_layout()
+		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_full.pdf')
 
 ########################################
 # Dust vector calculation
 ########################################
-def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=24.8,b1_cut=99,b2_cut=99,dusted=False,multithread=False):
+def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=24.8,b1_cut=99,b2_cut=99,multithread=False):
 	import aux_func
 	import numpy as np
 	import pandas as pd
@@ -247,23 +251,6 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	run_name=fnames[0].split("galaxies_")[1].split('_')[0]
 	data=pd.concat([pd.read_csv(f) for f in fnames])
 	ebv=np.zeros(len(data))
-	if dusted:
-		fd+='_dusted'
-		sfd_key=[k for k in data.columns.values if 'SFD' in k]
-		if len(sfd_key)>1:
-			sfd_nside=np.array([int(s.split('_')[0][1:]) for s in sfd_key])
-			maxfound=False
-			j=0
-			while not maxfound:
-				if sfd_nside[j]==np.max(sfd_nside):
-					maxfound=True
-				else:
-					j+=1
-			sfd_key=sfd_key[np.arange(len(sfd_key))[sfd_nside==np.max(sfd_nside)][0]]
-			ebv=data[sfd_key]
-		else:
-			ebv=np.array(data[sfd_key[0]])
-		print(f'Median E(B-V) applied to mock = {np.nanmedian(ebv):.4f} mag')
 	
 	####################
 	# Extinction effect
@@ -273,10 +260,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	A_b1,E_b1b2=aux_func.extinction_law(EBV,band_1,band_2)
 	A_b2=A_b1-E_b1b2
 	
-	if dusted:
-		print('Calculating observed dust vectors')
-	else:
-		print('Calculating intrinsic dust vectors')
+	print('Calculating dust vectors')
 	if multithread:
 		pool=mp.Pool(processes=min(multithread,len(A_sel)))
 		vector_comp=[pool.apply(aux_func.dust_vector,(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
@@ -293,9 +277,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 		mag.append(vector_comp[i]['mag'])
 		col.append(vector_comp[i]['col'])
 		zstr=f'{(zrange[i][0]+zrange[i][1])/2:.2f}'.translate({ord(c): None for c in '.'})
-		csv_name=f'{data_dir}dust_vector_{run_name}_z{zstr}_nodust.csv'
-		if dusted:
-			csv_name=csv_name.replace('nodust','dusted')
+		csv_name=f'{data_dir}dust_vector_{run_name}_z{zstr}.csv'
 		vector_comp[i]['EBV']=EBV
 		vector_comp[i].to_csv(csv_name,index=False)
 	print('Dust vectors saved')
@@ -332,6 +314,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=False):
 	import aux_func
 	import numpy as np
+	import healpy as hp
 	import pandas as pd
 	import multiprocessing as mp
 	import healpy.pixelfunc as pf
@@ -341,7 +324,11 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	####################
 	print('Reading Schlegel map')
 	if simple_ebv:
-		ebv_map=[np.linspace(0,0.2,pf.nside2npix(n)) for n in nside]#[0.1*np.ones(pf.nside2npix(n)) for n in nside]
+		pixel_set=[int(f.split('_')[-1][:-4]) for f in fnames]
+		ebv_map=[np.zeros(pf.nside2npix(n)) for n in nside]
+		for i in range(len(nside)):
+			pixel_child=np.unique([hp.query_polygon(nside[i],hp.boundaries(32,p,nest=False).T,nest=False) for p in pixel_set])
+			ebv_map[i][pixel_child]=np.linspace(0,0.2,len(pixel_child))
 	else:
 		ebv_map=[aux_func.sfd_map(percent=False,resample=n,lsst_footprint=False) for n in nside]
 	

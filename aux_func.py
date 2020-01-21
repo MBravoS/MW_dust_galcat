@@ -7,9 +7,7 @@ def dust_vector(data,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag_2
 	import numpy as np
 	import pandas as pd
 	
-	
 	mag_filt_list=[k for k in data.columns.values if k[-3:]=='_ap']
-	#print(mag_filt_list)
 	
 	if ebv_map is not None:
 		for mfl in mag_filt_list:
@@ -134,31 +132,11 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				####################
 				# Add extinction
 				####################
+				mag_filt_list=[k for k in data_sel.columns.values if k[-3:]=='_ap']
 				
-				#print('-----------------------------------------------')
-				#
-				#print(data_sel[f'{nside_key}_SFDmap'])
-				#print(np.median(data_sel[f'{nside_key}_SFDmap']))
-				#print('')
-				
-				A1,E12=extinction_law(data_sel[f'{nside_key}_SFDmap'],b1,b2)
-				Asel,temp=extinction_law(data_sel[f'{nside_key}_SFDmap'],bsel,b2)
-				A2=A1-E12
-				
-				#print(A1,A2,E12)
-				#print('')
-				#
-				#print(data_sel[b1]-data_sel[b2])
-				#print(np.median(data_sel[b1]-data_sel[b2]))
-				#print('')
-				
-				#data_sel[bsel]+=Asel
-				data_sel[b1]+=A1
-				data_sel[b2]+=A2
-				
-				#print(data_sel[b1]-data_sel[b2])
-				#print(np.median(data_sel[b1]-data_sel[b2]))
-				#print('')
+				for mfl in mag_filt_list:
+					A_mfl,temp=extinction_law(data_sel[f'{nside_key}_SFDmap'],mfl,b1)
+					data_sel[mfl]+=A_mfl
 				
 				mag_sel=data_sel[bsel]<mcut
 				mag_sel&=data_sel[b1]<b1cut

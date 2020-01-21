@@ -16,8 +16,8 @@ P=True
 O=/fast_scratch2/mbravo/MWdust_data/
 PLT=/fast_scratch2/mbravo/MWdust_plots/
 BC=True
-SM=True
+SDM=True
 M=56
-MS=u_ap
+MS=r_ap
 
-python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sm $SM -m $M -ms $MS
+python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS
