@@ -97,6 +97,12 @@ def desi(in_path,out_path):
 # FITS function
 ####################
 def fits2csv(fits_name,data_dir):
+	import numpy as np
+	import pandas as pd
+	from astropy import table
+	from astropy.io import fits
+	import healpy.pixelfunc as pf
+	
 	hdulist=fits.open(fits_name)
 	tbdata=hdulist[1].data
 	ra=tbdata['RA']
@@ -131,12 +137,7 @@ def fits2csv(fits_name,data_dir):
 
 def lsst(in_path,out_path):
 	import glob
-	import numpy as np
-	import pandas as pd
-	from astropy import table
-	from astropy.io import fits
 	import multiprocessing as mp
-	import healpy.pixelfunc as pf
 	
 	####################
 	# Reading FITS
