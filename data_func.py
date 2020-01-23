@@ -128,8 +128,8 @@ def fits2csv(fits_name,data_dir):
 	hdulist.close()
 	big_pixel=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
 	big_pixel=np.unique(big_pixel)[0]
-	data.to_csv(f'{out_path}galaxies_Buzzard_{big_pixel}.csv',index=False)
-	return(f'{out_path}galaxies_Buzzard_{big_pixel}.csv')
+	data.to_csv(f'{data_dir}galaxies_Buzzard_{big_pixel}.csv',index=False)
+	return(f'{data_dir}galaxies_Buzzard_{big_pixel}.csv')
 
 ####################
 # Read function
