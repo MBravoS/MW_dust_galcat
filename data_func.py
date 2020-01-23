@@ -92,6 +92,43 @@ def desi(in_path,out_path):
 ########################################
 # Read the LSST LC made with Buzzard
 ########################################
+
+####################
+# FITS function
+####################
+def fits2csv(fits_name,data_dir):
+	hdulist=fits.open(fits_name)
+	tbdata=hdulist[1].data
+	ra=tbdata['RA']
+	dec=tbdata['DEC']
+	z=tbdata['Z']
+	absmag=tbdata['AMAG']
+	appmag=tbdata['OMAG']
+	d={'redshift, cosmological' : z.astype('float64'),
+	'ra' : ra.astype('float64'),
+	'dec' : dec.astype('float64'),
+	'u_ab' : absmag[:,0].astype('float64'),
+	'g_ab' : absmag[:,1].astype('float64'),
+	'r_ab' : absmag[:,2].astype('float64'),
+	'i_ab' : absmag[:,3].astype('float64'),
+	'z_ab' : absmag[:,4].astype('float64'),
+	'u_ap' : appmag[:,0].astype('float64'),
+	'g_ap' : appmag[:,1].astype('float64'),
+	'r_ap' : appmag[:,2].astype('float64'),
+	'i_ap' : appmag[:,3].astype('float64'),
+	'z_ap' : appmag[:,4].astype('float64')}
+	fit_table=table.Table(d)
+	data=fit_table.to_pandas()
+	hdulist.close()
+	big_pixel=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
+	big_pixel=np.unique(big_pixel)[0]
+	data.to_csv(f'{out_path}galaxies_Buzzard_{big_pixel}.csv',index=False)
+	return(f'{out_path}galaxies_Buzzard_{big_pixel}.csv')
+
+####################
+# Read function
+####################
+
 def lsst(in_path,out_path):
 	import glob
 	import numpy as np
@@ -102,46 +139,11 @@ def lsst(in_path,out_path):
 	import healpy.pixelfunc as pf
 	
 	####################
-	# FITS function
-	####################
-	def fits2csv(fits_name,data_dir):
-		hdulist=fits.open(fits_name)
-		tbdata=hdulist[1].data
-		ra=tbdata['RA']
-		dec=tbdata['DEC']
-		z=tbdata['Z']
-		absmag=tbdata['AMAG']
-		appmag=tbdata['OMAG']
-		d={'redshift, cosmological' : z.astype('float64'),
-		'ra' : ra.astype('float64'),
-		'dec' : dec.astype('float64'),
-		'u_ab' : absmag[:,0].astype('float64'),
-		'g_ab' : absmag[:,1].astype('float64'),
-		'r_ab' : absmag[:,2].astype('float64'),
-		'i_ab' : absmag[:,3].astype('float64'),
-		'z_ab' : absmag[:,4].astype('float64'),
-		'u_ap' : appmag[:,0].astype('float64'),
-		'g_ap' : appmag[:,1].astype('float64'),
-		'r_ap' : appmag[:,2].astype('float64'),
-		'i_ap' : appmag[:,3].astype('float64'),
-		'z_ap' : appmag[:,4].astype('float64')}
-		fit_table=table.Table(d)
-		data=fit_table.to_pandas()
-		hdulist.close()
-		big_pixel=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
-		big_pixel=np.unique(big_pixel)[0]
-		data.to_csv(f'{out_path}galaxies_Buzzard_{big_pixel}.csv',index=False)
-		return(f'{out_path}galaxies_Buzzard_{big_pixel}.csv')
-	
-	####################
 	# Reading FITS
 	####################
 	fits_list=glob.glob(f'{in_path}*.fit')
-	print(fits_list)
 	pool=mp.Pool(processes=min(56,len(fits_list)))
-	csv_out=[pool.apply(fits2csv,(f,out_path,)) for f in fits_list]
-	#csv_out=[fits2csv(f,out_path) for f in fits_list]
-	#for c in csv_out:
-	#	print(c)
+	csv_out=[pool.apply_async(fits2csv,(f,out_path,)) for f in fits_list]
+	csv_out=[c.get() for c in csv_out]
 	
 	return(csv_out)
