@@ -110,19 +110,19 @@ def fits2csv(fits_name,data_dir):
 	z=tbdata['Z']
 	absmag=tbdata['AMAG']
 	appmag=tbdata['OMAG']
-	d={'redshift, cosmological' : z.astype('float64'),
-	'ra' : ra.astype('float64'),
-	'dec' : dec.astype('float64'),
-	'u_ab' : absmag[:,0].astype('float64'),
-	'g_ab' : absmag[:,1].astype('float64'),
-	'r_ab' : absmag[:,2].astype('float64'),
-	'i_ab' : absmag[:,3].astype('float64'),
-	'z_ab' : absmag[:,4].astype('float64'),
-	'u_ap' : appmag[:,0].astype('float64'),
-	'g_ap' : appmag[:,1].astype('float64'),
-	'r_ap' : appmag[:,2].astype('float64'),
-	'i_ap' : appmag[:,3].astype('float64'),
-	'z_ap' : appmag[:,4].astype('float64')}
+	d={'zobs':z.astype('float64'),
+		'ra':ra.astype('float64'),
+		'dec':dec.astype('float64'),
+		'u_ab':absmag[:,0].astype('float64'),
+		'g_ab':absmag[:,1].astype('float64'),
+		'r_ab':absmag[:,2].astype('float64'),
+		'i_ab':absmag[:,3].astype('float64'),
+		'z_ab':absmag[:,4].astype('float64'),
+		'u_ap':appmag[:,0].astype('float64'),
+		'g_ap':appmag[:,1].astype('float64'),
+		'r_ap':appmag[:,2].astype('float64'),
+		'i_ap':appmag[:,3].astype('float64'),
+		'z_ap':appmag[:,4].astype('float64')}
 	fit_table=table.Table(d)
 	data=fit_table.to_pandas()
 	hdulist.close()

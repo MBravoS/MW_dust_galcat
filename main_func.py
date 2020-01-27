@@ -249,7 +249,12 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	####################
 	print('Reading galaxy data for dust vector calculation')
 	run_name=fnames[0].split("galaxies_")[1].split('_')[0]
-	data=pd.concat([pd.read_csv(f) for f in fnames])
+	#data=pd.concat([pd.read_csv(f) for f in fnames])
+	data=[]
+	for f in fnames:
+		print(f)
+		data.append(pd.read_csv(f))
+	data=pd.concat(data)
 	ebv=np.zeros(len(data))
 	
 	####################
