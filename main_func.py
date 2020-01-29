@@ -208,7 +208,7 @@ def dust_mapping3(pnames,dvec,nside,zrange,out_dir,plot_dir):
 			z_label.append(z_key)
 		
 		EBV_final=np.array(EBV_recovery)
-		EBV_final=np.average(EBV_final,axis=0,weights=np.var(EBV_final,axis=1))
+		EBV_final=np.average(EBV_final,axis=0,weights=1/np.var(EBV_final,axis=1))
 		
 		####################
 		# Plots
