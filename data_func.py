@@ -127,9 +127,12 @@ def fits2csv(fits_name,data_dir):
 	data=fit_table.to_pandas()
 	hdulist.close()
 	big_pixel=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
-	big_pixel=np.unique(big_pixel)[0]
-	data.to_csv(f'{data_dir}galaxies_Buzzard_{big_pixel}.csv',index=False)
-	return(f'{data_dir}galaxies_Buzzard_{big_pixel}.csv')
+	csv_names=[]
+	for bp in np.unique(big_pixel):
+		cname=f'{data_dir}galaxies_Buzzard_{bp}.csv'
+		data.to_csv(cname,index=False)
+		csv_names.append(cname)
+	return(csv_names)
 
 ####################
 # Read function
@@ -137,14 +140,19 @@ def fits2csv(fits_name,data_dir):
 
 def lsst(in_path,out_path):
 	import glob
+	import time
 	import multiprocessing as mp
 	
 	####################
 	# Reading FITS
 	####################
+	t0=time.time()
 	fits_list=glob.glob(f'{in_path}*.fit')
 	pool=mp.Pool(processes=min(56,len(fits_list)))
 	csv_out=[pool.apply_async(fits2csv,(f,out_path,)) for f in fits_list]
 	csv_out=[c.get() for c in csv_out]
+	csv_out=[cc for c in csv_out for cc in c]
+	t1=time.time()
+	print(f'Running time to read and convert files = {t1-t0} s')
 	
 	return(csv_out)
