@@ -126,13 +126,10 @@ def fits2csv(fits_name,data_dir):
 	fit_table=table.Table(d)
 	data=fit_table.to_pandas()
 	hdulist.close()
-	big_pixel=pf.ang2pix(32,data['ra'],data['dec'],nest=False,lonlat=True)
-	csv_names=[]
-	for bp in np.unique(big_pixel):
-		cname=f'{data_dir}galaxies_Buzzard_{bp}.csv'
-		data.to_csv(cname,index=False)
-		csv_names.append(cname)
-	return(csv_names)
+	big_pixel=fits_name.split('.')[1]
+	csv_name=f'{data_dir}galaxies_Buzzard_{big_pixel}.csv'
+	data.to_csv(csv_name,index=False)
+	return(csv_name)
 
 ####################
 # Read function
