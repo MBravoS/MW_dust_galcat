@@ -365,8 +365,8 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	####################
 	# Border check
 	####################
-	print('Checking borders')
 	if border_check:
+		print('Checking borders')
 		if multithread:
 			pool=mp.Pool(processes=min(multithread,len(fnames)))
 			temp=[pool.apply_async(aux_func.find_border,(f,pix_ids,nside,res,)) for f in fnames]

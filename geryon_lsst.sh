@@ -12,7 +12,7 @@ rm /fast_scratch2/mbravo/MWdust_data/*Buzzard* /fast_scratch2/mbravo/MWdust_plot
 cd /home/mbravo/MW_dust_galcat
 
 D=lsst
-P=True
+P=False
 O=/fast_scratch2/mbravo/MWdust_data/
 PLT=/fast_scratch2/mbravo/MWdust_plots/
 BC=True
