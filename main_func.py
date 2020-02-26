@@ -278,13 +278,15 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	print(zrange)
 	for z in zrange:
 		print(z)
-	if multithread:
-		pool=mp.Pool(processes=min(multithread,len(A_sel)))
-		vector_comp=[pool.apply(aux_func.dust_vector,(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
-														EBV,mag_cut,b1_cut,b2_cut, ebv[(data['zobs']>z[0])&(data['zobs']<z[1])],)) for z in zrange]
-	else:
-		vector_comp=[aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
-											EBV,mag_cut,b1_cut,b2_cut,ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in zrange]
+	#if multithread:
+	#	pool=mp.Pool(processes=min(multithread,len(A_sel)))
+	#	vector_comp=[pool.apply(aux_func.dust_vector,(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
+	#													EBV,mag_cut,b1_cut,b2_cut, ebv[(data['zobs']>z[0])&(data['zobs']<z[1])],)) for z in zrange]
+	#else:
+	#	vector_comp=[aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
+	#										EBV,mag_cut,b1_cut,b2_cut,ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in zrange]
+	vector_comp=[aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
+										EBV,mag_cut,b1_cut,b2_cut,ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in zrange]
 	
 	delta=[]
 	mag=[]
