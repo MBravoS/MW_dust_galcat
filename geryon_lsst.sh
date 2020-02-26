@@ -8,11 +8,11 @@
 
 ##########################
 
-rm /fast_scratch2/mbravo/MWdust_data/*Buzzard* /fast_scratch2/mbravo/MWdust_plots/*Buzzard*
+#rm /fast_scratch2/mbravo/MWdust_data/*Buzzard* /fast_scratch2/mbravo/MWdust_plots/*Buzzard*
 cd /home/mbravo/MW_dust_galcat
 
 D=lsst
-P=False
+P=True
 O=/fast_scratch2/mbravo/MWdust_data/
 PLT=/fast_scratch2/mbravo/MWdust_plots/
 BC=True
