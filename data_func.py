@@ -148,7 +148,6 @@ def lsst(in_path,out_path):
 	pool=mp.Pool(processes=min(56,len(fits_list)))
 	csv_out=[pool.apply_async(fits2csv,(f,out_path,)) for f in fits_list]
 	csv_out=[c.get() for c in csv_out]
-	csv_out=[cc for c in csv_out for cc in c]
 	t1=time.time()
 	print(f'Running time to read and convert files = {t1-t0} s')
 	
