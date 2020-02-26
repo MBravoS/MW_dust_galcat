@@ -59,7 +59,8 @@ def main():
 	if opts.prepare_data:
 		fnames=getattr(data_func,opts.data_files)(path_dict[opts.data_files],opts.out_dir)
 	else:
-		fnames=glob.glob(f'{opts.in_dir}/galaxies_{opts.data_files}*csv')
+		fname_dict={'desi':'GALFORM','lsst':'Buzzard'}
+		fnames=glob.glob(f'{opts.in_dir}/galaxies_{fname_dict[opts.data_files]}*csv')
 	
 	####################
 	# Dust vector
