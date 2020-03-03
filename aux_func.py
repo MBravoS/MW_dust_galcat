@@ -112,6 +112,9 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 	data_full=pd.read_csv(fname)
 	pixel_name=[]
 	
+	if bcheck:
+		print(f'Will enforce borders for {fname.split("/")[-1]}')
+	
 	for ns in nside:
 		pixel_df={}
 		nside_key=f'n{np.log2(ns):.0f}'
@@ -122,7 +125,6 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 			####################
 			data_sel=data_full.loc[(data_full['zobs']>z[0])&(data_full['zobs']<z[1])].copy()
 			if bcheck:
-				print('Enforcing borders')
 				n_nonborder=np.sum(~data_sel[f'{nside_key}_border'])
 				data_sel=data_sel.loc[~data_sel[f'{nside_key}_border']]
 			else:

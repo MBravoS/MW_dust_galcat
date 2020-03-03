@@ -3,6 +3,7 @@
 ########################################
 import os
 import glob
+import time
 import argparse
 import data_func
 import main_func
@@ -21,6 +22,8 @@ def s2b(s):
 	return(b)
 
 def main():
+	t0=time.time()
+	
 	parser=argparse.ArgumentParser()
 	parser.add_argument('-d','--data_files',help='The galaxy catalogue to use. By default creates a simple test dataset.',default='test')
 	parser.add_argument('-p','--prepare_data',help='The function from aux_func to copy the data into the file scheme that the code uses.',
@@ -88,6 +91,9 @@ def main():
 	#main_func.dust_mapping(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
 	#main_func.dust_mapping2(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
 	main_func.dust_mapping3(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
+	
+	t1=time.time()
+	print(f'Total running time = {t1-t0} s')
 
 if __name__ == '__main__':
 	main()
