@@ -139,6 +139,7 @@ def fits2csv(fits_name):
 def lsst(in_path,out_path):
 	import glob
 	import time
+	import pandas as pd
 	import multiprocessing as mp
 	
 	####################
