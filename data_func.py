@@ -96,7 +96,7 @@ def desi(in_path,out_path):
 ####################
 # FITS function
 ####################
-def fits2csv(fits_name,data_dir):
+def fits2csv(fits_name):
 	import numpy as np
 	import pandas as pd
 	from astropy import table
@@ -126,10 +126,11 @@ def fits2csv(fits_name,data_dir):
 	fit_table=table.Table(d)
 	data=fit_table.to_pandas()
 	hdulist.close()
-	big_pixel=fits_name.split('.')[1]
-	csv_name=f'{data_dir}galaxies_Buzzard_{big_pixel}.csv'
-	data.to_csv(csv_name,index=False)
-	return(csv_name)
+	data['big_pix']=pf.ang2pix(32,theta=data['ra'],phi=data['dec'],lonlat=True,nest=False)
+	#big_pixel=fits_name.split('.')[1]
+	#csv_name=f'{data_dir}galaxies_Buzzard_{big_pixel}.csv'
+	#data.to_csv(csv_name,index=False)
+	return(data)#csv_name)
 
 ####################
 # Read function
@@ -144,11 +145,20 @@ def lsst(in_path,out_path):
 	# Reading FITS
 	####################
 	t0=time.time()
+	
 	fits_list=glob.glob(f'{in_path}*.fit')
 	pool=mp.Pool(processes=min(56,len(fits_list)))
-	csv_out=[pool.apply_async(fits2csv,(f,out_path,)) for f in fits_list]
-	csv_out=[c.get() for c in csv_out]
+	df_out=[pool.apply_async(fits2csv,(f,)) for f in fits_list]
+	df_out=pd.concat([c.get() for c in df_out])
+	
+	df_names=[]
+	bigpix=np.unique(df_out['big_pix'])
+	for bp in bigpix:
+		df_temp=df_out.loc[df_out['big_pix']==bp]
+		df_temp.drop(columns=['big_pix'],inplace=True)
+		df_temp.to_csv(f'{out_path}galaxies_Buzzard_{bp}.csv')
+	
 	t1=time.time()
 	print(f'Running time to read and convert files = {t1-t0} s')
 	
-	return(csv_out)
+	return(df_out)
