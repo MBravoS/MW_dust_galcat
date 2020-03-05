@@ -157,8 +157,9 @@ def lsst(in_path,out_path):
 	bigpix=np.unique(df_out['big_pix'])
 	for bp in bigpix:
 		df_temp=df_out.loc[df_out['big_pix']==bp]
-		df_temp.drop(columns=['big_pix'],inplace=True)
-		df_temp.to_csv(f'{out_path}galaxies_Buzzard_{bp}.csv')
+		if len(df_temp)>100:
+			df_temp.drop(columns=['big_pix'],inplace=True)
+			df_temp.to_csv(f'{out_path}galaxies_Buzzard_{bp}.csv',index=False)
 	
 	t1=time.time()
 	print(f'Running time to read and convert files = {t1-t0} s')
