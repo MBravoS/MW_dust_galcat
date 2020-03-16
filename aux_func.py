@@ -81,6 +81,38 @@ def find_border(fname,pix_list,nside,res):
 	csv_data.to_csv(fname,index=False)
 
 ########################################
+# Add observational errors per file
+########################################
+def magz_err_perfile(fname):
+	import numpy as np
+	import pandas as pd
+	
+	data=pd.read_csv(fname)
+	
+	####################
+	# mag errors
+	####################
+	bands=[k for k in data.columns.values if '_ap' in k]
+	sigma_band=np.array([6.0399,2.0000,1.6635,3.168,6.6226])*1e-12
+	sigma={bands[i]:sigma_band[i] for i in xrange(5)}
+	for k in bands:
+		temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma_band[k],size=len(data)))
+		data[f'{k}_sim']=data[k]*1.0
+		data.loc[~np.isnan(temp_mag),k]=temp_mag.loc[~np.isnan(temp_mag)]
+		data.loc[np.isnan(temp_mag),k]=99
+	
+	####################
+	# z errors
+	####################
+	zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
+	zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap']-25.3))),size=len(data))
+	zerr_i_sel=data['i_ap']>25.3
+	zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
+	data['zobs']=data['zobs']+(1+data['zobs'])*zerr_sigma
+	
+	data.to_csv(fname)
+
+########################################
 # Assign pixel IDs to galaxies
 ########################################
 def pix_id(fname,nside,sfd_map):

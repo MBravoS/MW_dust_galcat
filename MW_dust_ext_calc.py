@@ -66,6 +66,11 @@ def main():
 		fnames=glob.glob(f'{opts.in_dir}/galaxies_{fname_dict[opts.data_files]}*csv')
 	
 	####################
+	# Addd errors
+	####################
+	main_func.magz_err(fnames,multithread=opts.multithread)
+	
+	####################
 	# Dust vector
 	####################
 	dust_vector=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
