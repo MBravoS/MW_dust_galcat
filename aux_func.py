@@ -95,10 +95,9 @@ def magz_err_perfile(fname):
 	bands=['u_ap','g_ap','r_ap','i_ap','z_ap']
 	sigma_band=np.array([6.0399,2.0000,1.6635,3.168,6.6226])*1e-12
 	sigma={bands[i]:sigma_band[i] for i in range(5)}
-	print(data.columns.values)
-	print(sigma)
 	for k in bands:
-		print(k)
+		print(data[k])
+		print(sigma_band[k])
 		temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma_band[k],size=len(data)))
 		data[f'{k}_sim']=data[k]*1.0
 		data.loc[~np.isnan(temp_mag),k]=temp_mag.loc[~np.isnan(temp_mag)]
