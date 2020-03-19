@@ -94,7 +94,7 @@ def magz_err_perfile(fname):
 	####################
 	bands=[k for k in data.columns.values if '_ap' in k]
 	sigma_band=np.array([6.0399,2.0000,1.6635,3.168,6.6226])*1e-12
-	sigma={bands[i]:sigma_band[i] for i in xrange(5)}
+	sigma={bands[i]:sigma_band[i] for i in range(5)}
 	for k in bands:
 		temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma_band[k],size=len(data)))
 		data[f'{k}_sim']=data[k]*1.0
