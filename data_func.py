@@ -16,7 +16,8 @@ def test(temp,file_path):
 	####################
 	# DF definition
 	####################
-	filter_set=['u_ap','u_ab','r_ap','r_ab','z_ap','z_ab']
+	filter_set=['u','g','r','i','z']
+	filter_set=[f'{fs}_ap' for fs in filter_set]+[f'{fs}_ab' for fs in filter_set]
 	zrange=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]]
 	
 	####################

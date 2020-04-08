@@ -68,7 +68,7 @@ def main():
 	####################
 	# Addd errors
 	####################
-	main_func.magz_err(fnames,multithread=opts.multithread)
+	#main_func.magz_err(fnames,multithread=opts.multithread)
 	
 	####################
 	# Dust vector
@@ -93,9 +93,8 @@ def main():
 	####################
 	# Dust map
 	####################
-	#main_func.dust_mapping(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
+	main_func.dust_mapping(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
 	#main_func.dust_mapping2(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
-	main_func.dust_mapping3(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
 	
 	t1=time.time()
 	print(f'Total running time = {t1-t0} s')

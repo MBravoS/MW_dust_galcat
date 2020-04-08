@@ -108,6 +108,7 @@ def magz_err_perfile(fname):
 	zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap']-25.3))),size=len(data))
 	zerr_i_sel=data['i_ap']>25.3
 	zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
+	data['zobs_sim']=data['zobs']*1.0
 	data['zobs']=data['zobs']+(1+data['zobs'])*zerr_sigma
 	
 	data.to_csv(fname)
@@ -128,8 +129,14 @@ def pix_id(fname,nside,sfd_map):
 		col_names.append(col_name)
 		pix=pf.ang2pix(nside[i],csv_data['ra'],csv_data['dec'],nest=False,lonlat=True)
 		csv_data[col_name]=pix
-		csv_data[f'{col_name}_SFDmap']=sfd_map[i][pix]
-		pix_ids.append(np.unique(pix))
+		uniqpix=np.unique(pix)
+		sfd_map_sample=np.random.choice(sfd_map[i],len(uniqpix),replace=False)
+		sfd_map_sample={uniqpix[i]:sfd_map_sample[i] for i in range(len(uniqpix))}
+		pix_ebv=np.zeros(len(pix))
+		for pid in uniqpix:
+			pix_ebv[pix==pid]=sfd_map_sample[pid]
+		csv_data[f'{col_name}_SFDmap']=pix_ebv#sfd_map[i][pix]
+		pix_ids.append(uniqpix)
 	csv_data.to_csv(fname,index=False)
 	return(col_names,pix_ids)
 	
@@ -234,7 +241,7 @@ def sfd_map(path='./',percent=True,resample=None,lsst_footprint=True):
 		percentiles=np.percentile(map_data,[75,50,25])
 		return(percentiles)
 	else:
-		return(map_data)
+		return(np.array(map_data))
 
 ########################################
 # Fit the dust vector as function of EBV
