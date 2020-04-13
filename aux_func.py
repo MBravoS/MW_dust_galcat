@@ -195,17 +195,16 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				col=stats.binned_statistic(data_sel[nside_key],data_sel[b1]-data_sel[b2],statistic='median',bins=histogram_bins)[0]
 				ebv=stats.binned_statistic(data_sel[nside_key],data_sel[f'{nside_key}_SFDmap'],statistic='median',bins=histogram_bins)[0]
 				
-				print('Length check')
 				pixel_df[f'{nside_key}_pixID']=bin_id
 				pixel_df[f'{nside_key}_EBV']=ebv
 				pixel_df[f'{nside_key}_{z_key}_count']=counts
 				pixel_df[f'{nside_key}_{z_key}_mag']=mag
 				pixel_df[f'{nside_key}_{z_key}_col']=col
-				print(bin_id.shape,ebv.shape,counts.shape,mag.shape,col.shape)
+				#print(bin_id.shape,ebv.shape,counts.shape,mag.shape,col.shape)
 				pname=fname.replace('galaxies',f'pixel_{nside_key}')
-				#print('Array check:')
-				#for k in pixel_df.keys():
-				#	print(f'{k} : {len(pixel_df[k])}')
+				print('Array check:')
+				for k in pixel_df.keys():
+					print(f'{k} : {len(pixel_df[k])}')
 				pd.DataFrame(pixel_df).to_csv(pname,index=False)
 				pixel_name.append(pname)
 			else:
