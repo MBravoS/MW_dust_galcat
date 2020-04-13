@@ -155,6 +155,7 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 		print(f'Will enforce borders for {fname.split("/")[-1]}')
 	
 	for ns in nside:
+		print('Assembling dataframe')
 		pixel_df={}
 		nside_key=f'n{np.log2(ns):.0f}'
 		for z in zr:
@@ -189,6 +190,7 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				# Pixel values
 				####################
 				bin_id,bin_id_pos,counts=np.unique(data_sel[nside_key],return_counts=True,return_inverse=True)
+				print(bin_id,counts)
 				histogram_bins=np.array([b-0.5 for b in bin_id]+[bin_id[-1]+0.5])
 				
 				mag=stats.binned_statistic(data_sel[nside_key],data_sel[b1],statistic='median',bins=histogram_bins)[0]
@@ -201,11 +203,7 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				pixel_df[f'{nside_key}_{z_key}_mag']=mag
 				pixel_df[f'{nside_key}_{z_key}_col']=col
 				pname=fname.replace('galaxies',f'pixel_{nside_key}')
-				print('Array check:')
-				for k in pixel_df.keys():
-					print(f'{k} : {pixel_df[k]}')
-				pixel_df=pd.DataFrame(pixel_df)
-				pixel_df.to_csv(pname,index=False)
+				pd.DataFrame(pixel_df).to_csv(pname,index=False)
 				pixel_name.append(pname)
 			else:
 				pixel_name.append(None)
