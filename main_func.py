@@ -317,15 +317,15 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 		ebv_map=[np.linspace(0,0.2,pf.nside2npix(n)) for n in nside]
 	else:
 		ebv_map=[aux_func.sfd_map(percent=False,resample=n,lsst_footprint=False) for n in nside]
-	ebv_map={fnames[i]:[np.array_split(em,len(fnames))[i] for em in ebv_map] for i in range(len(fnames))}
+	#ebv_map={fnames[i]:[np.array_split(em,len(fnames))[i] for em in ebv_map] for i in range(len(fnames))}
 	
 	print('Reading galaxy data for pixelisation')
 	if multithread:
 		pool=mp.Pool(processes=min(multithread,len(fnames)))
-		temp=[pool.apply_async(aux_func.pix_id,(f,nside,ebv_map[f],)) for f in fnames]
+		temp=[pool.apply_async(aux_func.pix_id,(f,nside,ebv_map,)) for f in fnames]
 		temp=[t.get() for t in temp]
 	else:
-		temp=[aux_func.pix_id(f,nside,ebv_map[f]) for f in fnames]
+		temp=[aux_func.pix_id(f,nside,ebv_map) for f in fnames]
 	res=temp[0][0]
 	pix_ids=[t[1] for t in temp]
 	pix_ids=[np.concatenate([p[i] for p in pix_ids]) for i in range(len(nside))]
