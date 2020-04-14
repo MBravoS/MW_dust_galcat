@@ -209,6 +209,8 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 			else:
 				pixel_name.append(None)
 	
+	print('----------------------------------------------------------')
+	
 	return(pixel_name)
 
 ########################################
