@@ -116,7 +116,7 @@ def magz_err_perfile(fname):
 ########################################
 # Assign pixel IDs to galaxies
 ########################################
-def pix_id(fname,nside,sfd_map):
+def pix_id(fname,nside,sfd_map,seed):
 	import numpy as np
 	import pandas as pd
 	import healpy.pixelfunc as pf
@@ -130,6 +130,7 @@ def pix_id(fname,nside,sfd_map):
 		pix=pf.ang2pix(nside[i],csv_data['ra'],csv_data['dec'],nest=False,lonlat=True)
 		csv_data[col_name]=pix
 		uniqpix=np.unique(pix)
+		np.random.seed(i*1e3+seed)
 		sfd_map_sample=np.random.choice(sfd_map[i],len(uniqpix),replace=False)
 		sfd_map_sample={uniqpix[i]:sfd_map_sample[i] for i in range(len(uniqpix))}
 		pix_ebv=np.zeros(len(pix))
@@ -190,12 +191,11 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				# Pixel values
 				####################
 				bin_id,bin_id_pos,counts=np.unique(data_sel[nside_key],return_counts=True,return_inverse=True)
-				print(bin_id,counts)
 				histogram_bins=np.array([b-0.5 for b in bin_id]+[bin_id[-1]+0.5])
-				
 				mag=stats.binned_statistic(data_sel[nside_key],data_sel[b1],statistic='median',bins=histogram_bins)[0]
 				col=stats.binned_statistic(data_sel[nside_key],data_sel[b1]-data_sel[b2],statistic='median',bins=histogram_bins)[0]
 				ebv=stats.binned_statistic(data_sel[nside_key],data_sel[f'{nside_key}_SFDmap'],statistic='median',bins=histogram_bins)[0]
+				print(ebv)
 				
 				pixel_df[f'{nside_key}_pixID']=bin_id
 				pixel_df[f'{nside_key}_EBV']=ebv
@@ -203,13 +203,10 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				pixel_df[f'{nside_key}_{z_key}_mag']=mag
 				pixel_df[f'{nside_key}_{z_key}_col']=col
 				pname=fname.replace('galaxies',f'pixel_{nside_key}')
-				print(pixel_df[f'{nside_key}_EBV'])
 				pd.DataFrame(pixel_df).to_csv(pname,index=False)
 				pixel_name.append(pname)
 			else:
 				pixel_name.append(None)
-	
-	print('----------------------------------------------------------')
 	
 	return(pixel_name)
 
