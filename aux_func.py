@@ -130,7 +130,7 @@ def pix_id(fname,nside,sfd_map,seed):
 		pix=pf.ang2pix(nside[i],csv_data['ra'],csv_data['dec'],nest=False,lonlat=True)
 		csv_data[col_name]=pix
 		uniqpix=np.unique(pix)
-		np.random.seed(i*1e3+seed)
+		np.random.seed(i*1000+seed)
 		sfd_map_sample=np.random.choice(sfd_map[i],len(uniqpix),replace=False)
 		sfd_map_sample={uniqpix[i]:sfd_map_sample[i] for i in range(len(uniqpix))}
 		pix_ebv=np.zeros(len(pix))
