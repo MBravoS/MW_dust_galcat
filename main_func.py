@@ -316,7 +316,7 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 		#	ebv_map[i][pixel_child]=np.linspace(0,0.2,len(pixel_child))
 		ebv_map=[np.linspace(0,0.2,pf.nside2npix(n)) for n in nside]
 	else:
-		ebv_map=[aux_func.sfd_map(percent=False,resample=n,lsst_footprint=False) for n in nside]
+		ebv_map=[aux_func.sfd_map(percent=False,resample=n) for n in nside]
 	#ebv_map={fnames[i]:[np.array_split(em,len(fnames))[i] for em in ebv_map] for i in range(len(fnames))}
 	
 	print('Reading galaxy data for pixelisation')
@@ -358,14 +358,14 @@ def pixel_stat(fnames,nside,band_sel,band_1,band_2,zrange,mag_cut=24.8,b1_cut=99
 	# Stats calculation
 	####################
 	print('Calculating pixelised properties')
-	#if multithread:
-	#	pool=mp.Pool(processes=min(multithread,len(fnames)))
-	#	results=[pool.apply_async(aux_func.pix_stat,(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check,)) for f in fnames]
-	#	results=[r.get() for r in results]
-	#	pool.close()
-	#else:
-	#	results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check) for f in fnames]
-	results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check) for f in fnames]
+	if multithread:
+		pool=mp.Pool(processes=min(multithread,len(fnames)))
+		results=[pool.apply_async(aux_func.pix_stat,(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check,)) for f in fnames]
+		results=[r.get() for r in results]
+		pool.close()
+	else:
+		results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check) for f in fnames]
+	#results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check) for f in fnames]
 	
 	results=[r2 for r1 in results for r2 in r1 if r2 is not None]
 	print('Statistics ready')

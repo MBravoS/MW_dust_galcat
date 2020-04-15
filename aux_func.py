@@ -195,7 +195,6 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 				mag=stats.binned_statistic(data_sel[nside_key],data_sel[b1],statistic='median',bins=histogram_bins)[0]
 				col=stats.binned_statistic(data_sel[nside_key],data_sel[b1]-data_sel[b2],statistic='median',bins=histogram_bins)[0]
 				ebv=stats.binned_statistic(data_sel[nside_key],data_sel[f'{nside_key}_SFDmap'],statistic='median',bins=histogram_bins)[0]
-				print(ebv)
 				
 				pixel_df[f'{nside_key}_pixID']=bin_id
 				pixel_df[f'{nside_key}_EBV']=ebv
