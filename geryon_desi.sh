@@ -8,7 +8,7 @@
 
 ##########################
 
-rm /fast_scratch2/mbravo/MWdust_data/*GALFORM* /fast_scratch2/mbravo/MWdust_plots/*GALFORM*
+rm /fast_scratch2/mbravo/MWdust_data/*GALFORM* #/fast_scratch2/mbravo/MWdust_plots/*GALFORM*
 cd /home/mbravo/MW_dust_galcat
 
 D=desi
@@ -19,6 +19,6 @@ BC=True
 SDM=False
 M=56
 MS=r_ap
-N=512
+N=64
 
 python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -n $N
