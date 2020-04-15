@@ -21,4 +21,4 @@ M=56
 MS=r_ap
 N=512
 
-python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS #-n $N
+python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -n $N
