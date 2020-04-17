@@ -8,8 +8,10 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 	import pandas as pd
 	import splotch as sp
 	import scipy.optimize as opti
+	import matplotlib.lines as lines
 	import matplotlib.pyplot as plot
 	import scipy.interpolate as interp
+	import matplotlib.patches as patches
 	
 	for i in range(len(nside)):
 		ns=nside[i]
@@ -20,6 +22,7 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		EBV_input=data[f'{nside_key}_EBV']
 		for j in range(len(zrange)):
 			zr=zrange[j]
+			z_label.append(f'z_{{{np.sum(zr)/2:.2f}}}')
 			z_key=f'z{np.sum(zr)/2:.2f}'.replace('.','')
 			
 			####################
@@ -66,8 +69,7 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 			for k in range(len(ebv_from_delta[j])):
 				ebv_recover[k]=opti.minimize(dist,x0=0.0,args=(ebv_from_delta[j][k],ebv_from_mag[j][k],ebv_from_col[j][k])).x
 			
-			EBV_recovery.append(ebv_recover-np.min(ebv_recover))
-			z_label.append(z_key)
+			EBV_recovery.append(ebv_recover+np.median(EBV_input))
 		
 		EBV_final=np.array(EBV_recovery)
 		EBV_final=np.average(EBV_final,axis=0,weights=1/np.var(EBV_final,axis=1))
@@ -77,10 +79,15 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		####################
 		plot.figure()
 		for j in range(len(zrange)):
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_delta[j],plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_mag[j],plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_col[j],plabel=f'$u-z$, {z_label[j]}',c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
-						ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
+			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_delta[j],c=f'C{j}',marker='d')
+			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_mag[j],c=f'C{j}',marker='*')
+			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_col[j],c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
+						ylabel='$\Delta E(B-V)_\mathrm{recovered}$',xlim=[-0.1,0.2])
+		plot.legend([patches.Patch(color=f'C{j}') for j in range(len(zrange))]+
+					[lines.Line2D([0.5],[0.5],color='gray',marker='d',linestyle=''),
+						lines.Line2D([0.5],[0.5],color='gray',marker='*',linestyle=''),
+						lines.Line2D([0.5],[0.5],color='gray',marker='o',linestyle='')],
+					[f'{z_label[j]}' for j in range(len(zrange))]+['$\delta$','$u$','$u-z$'])
 		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_full.pdf')
@@ -88,13 +95,14 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		plot.figure()
 		for j in range(len(zrange)):
 			sp.scatter(EBV_input,EBV_recovery[j],plabel=z_label[j],c=f'C{j}',xlabel='$E(B-V)_\mathrm{input}$',
-						ylabel='$E(B-V)_\mathrm{recovered}$')
+						ylabel='$E(B-V)_\mathrm{recovered}$',xlim=[0,0.2],ylim=[-0.1,0.3])
 		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_combined.pdf')
 		
 		plot.figure()
-		sp.scatter(EBV_input,EBV_final,c='C0',xlabel='$E(B-V)_\mathrm{input}$',ylabel='$E(B-V)_\mathrm{recovered}$')
+		sp.scatter(EBV_input,EBV_final,c='C0',xlabel='$E(B-V)_\mathrm{input}$',ylabel='$E(B-V)_\mathrm{recovered}$',
+					xlim=[0,0.2],ylim=[0,0.2])
 		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_final.pdf')

@@ -3,7 +3,7 @@
 #PBS -N MWdust_DESI
 #PBS -k eo
 #PBS -l nodes=1:ppn=56
-#PBS -l walltime=02:00:00
+#PBS -l walltime=04:00:00
 #PBS -q newton
 
 ##########################
@@ -19,6 +19,5 @@ BC=True
 SDM=False
 M=56
 MS=r_ap
-N=64
 
-python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -n $N
+python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -n 64 512
