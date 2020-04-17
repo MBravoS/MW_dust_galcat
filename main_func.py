@@ -22,7 +22,7 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		EBV_input=data[f'{nside_key}_EBV']
 		for j in range(len(zrange)):
 			zr=zrange[j]
-			z_label.append(f'z_{{{np.sum(zr)/2:.2f}}}')
+			z_label.append(f'$z_{{{np.sum(zr)/2:.2f}}}$')
 			z_key=f'z{np.sum(zr)/2:.2f}'.replace('.','')
 			
 			####################
@@ -77,32 +77,37 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		####################
 		# Plots
 		####################
+		msize,trans=[6,1]
+		if nside[i]>64:
+			msize,trans=[0.6,0.1]
+		
 		plot.figure()
 		for j in range(len(zrange)):
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_delta[j],c=f'C{j}',marker='d')
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_mag[j],c=f'C{j}',marker='*')
+			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_delta[j],c=f'C{j}',marker='d',markersize=msize,alpha=trans)
+			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_mag[j],c=f'C{j}',marker='*',markersize=msize,alpha=trans)
 			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_col[j],c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
-						ylabel='$\Delta E(B-V)_\mathrm{recovered}$',xlim=[-0.1,0.2])
+						ylabel='$\Delta E(B-V)_\mathrm{recovered}$',xlim=[-0.1,0.2],markersize=msize,alpha=trans)
+		sp.axline(a=1,color='k',linestyle='dashed')
 		plot.legend([patches.Patch(color=f'C{j}') for j in range(len(zrange))]+
 					[lines.Line2D([0.5],[0.5],color='gray',marker='d',linestyle=''),
 						lines.Line2D([0.5],[0.5],color='gray',marker='*',linestyle=''),
-						lines.Line2D([0.5],[0.5],color='gray',marker='o',linestyle='')],
-					[f'{z_label[j]}' for j in range(len(zrange))]+['$\delta$','$u$','$u-z$'])
-		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
+						lines.Line2D([0.5],[0.5],color='gray',marker='o',linestyle=''),
+						lines.Line2D([0,1],[0,1],color='black',linestyle='dashed')],
+					[f'{z_label[j]}' for j in range(len(zrange))]+['$\delta$','$u$','$u-z$','1:1'])
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_full.pdf')
 		
 		plot.figure()
 		for j in range(len(zrange)):
 			sp.scatter(EBV_input,EBV_recovery[j],plabel=z_label[j],c=f'C{j}',xlabel='$E(B-V)_\mathrm{input}$',
-						ylabel='$E(B-V)_\mathrm{recovered}$',xlim=[0,0.2],ylim=[-0.1,0.3])
+						ylabel='$E(B-V)_\mathrm{recovered}$',xlim=[0,0.2],ylim=[-0.1,0.3],markersize=msize,alpha=trans)
 		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_combined.pdf')
 		
 		plot.figure()
 		sp.scatter(EBV_input,EBV_final,c='C0',xlabel='$E(B-V)_\mathrm{input}$',ylabel='$E(B-V)_\mathrm{recovered}$',
-					xlim=[0,0.2],ylim=[0,0.2])
+					xlim=[0,0.2],ylim=[0,0.2],markersize=msize,alpha=trans)
 		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_final.pdf')
@@ -329,7 +334,6 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	else:
 		temp=[aux_func.pix_id(fnames[j],nside,ebv_map,j) for j in range(len(fnames))]
 	res=temp[0][0]
-	print(res)
 	pix_ids=[t[1] for t in temp]
 	pix_ids=[np.concatenate([p[i] for p in pix_ids]) for i in range(len(nside))]
 	
