@@ -73,7 +73,7 @@ def find_border(fname,pix_list,nside,res):
 		pids=np.unique(csv_data[res[i]])
 		bcheck=np.zeros(len(csv_data)).astype('bool')
 		for pid in pids:
-			neigh=pf.get_all_neighbours(nside,pid)
+			neigh=pf.get_all_neighbours(nside[i],pid)
 			for k in neigh:
 				if k not in pix_list[i]:
 					bcheck[csv_data[res[i]]==pid]=True
