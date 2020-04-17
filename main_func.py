@@ -83,10 +83,10 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		
 		plot.figure()
 		for j in range(len(zrange)):
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_delta[j],c=f'C{j}',marker='d',size=msize,alpha=trans)
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_mag[j],c=f'C{j}',marker='*',size=msize,alpha=trans)
+			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_delta[j],c=f'C{j}',marker='d',s=msize,alpha=trans)
+			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_mag[j],c=f'C{j}',marker='*',s=msize,alpha=trans)
 			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_col[j],c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
-						ylabel='$\Delta E(B-V)_\mathrm{recovered}$',xlim=[-0.1,0.2],size=msize,alpha=trans)
+						ylabel='$\Delta E(B-V)_\mathrm{recovered}$',xlim=[-0.1,0.2],s=msize,alpha=trans)
 		sp.axline(a=1,color='k',linestyle='dashed')
 		plot.legend([patches.Patch(color=f'C{j}') for j in range(len(zrange))]+
 					[lines.Line2D([0.5],[0.5],color='gray',marker='d',linestyle=''),
@@ -100,14 +100,14 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		plot.figure()
 		for j in range(len(zrange)):
 			sp.scatter(EBV_input,EBV_recovery[j],plabel=z_label[j],c=f'C{j}',xlabel='$E(B-V)_\mathrm{input}$',
-						ylabel='$E(B-V)_\mathrm{recovered}$',xlim=[0,0.2],ylim=[-0.1,0.3],size=msize,alpha=trans)
+						ylabel='$E(B-V)_\mathrm{recovered}$',xlim=[0,0.2],ylim=[-0.1,0.3],s=msize,alpha=trans)
 		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_combined.pdf')
 		
 		plot.figure()
 		sp.scatter(EBV_input,EBV_final,c='C0',xlabel='$E(B-V)_\mathrm{input}$',ylabel='$E(B-V)_\mathrm{recovered}$',
-					xlim=[0,0.2],ylim=[0,0.2],size=msize,alpha=trans)
+					xlim=[0,0.2],ylim=[0,0.2],s=msize,alpha=trans)
 		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_final.pdf')
