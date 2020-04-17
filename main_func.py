@@ -317,15 +317,9 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	####################
 	print('Reading Schlegel map')
 	if simple_ebv:
-		#pixel_set=[int(f.split('_')[-1][:-4]) for f in fnames]
-		#ebv_map=[np.zeros(pf.nside2npix(n)) for n in nside]
-		#for i in range(len(nside)):
-		#	pixel_child=np.unique([hp.query_polygon(nside[i],hp.boundaries(32,p,nest=False).T,nest=False) for p in pixel_set])
-		#	ebv_map[i][pixel_child]=np.linspace(0,0.2,len(pixel_child))
 		ebv_map=[np.linspace(0,0.2,pf.nside2npix(n)) for n in nside]
 	else:
 		ebv_map=[aux_func.sfd_map(percent=False,resample=n) for n in nside]
-	#ebv_map={fnames[i]:[np.array_split(em,len(fnames))[i] for em in ebv_map] for i in range(len(fnames))}
 	
 	print('Reading galaxy data for pixelisation')
 	if multithread:
@@ -335,6 +329,7 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	else:
 		temp=[aux_func.pix_id(fnames[j],nside,ebv_map,j) for j in range(len(fnames))]
 	res=temp[0][0]
+	print(res)
 	pix_ids=[t[1] for t in temp]
 	pix_ids=[np.concatenate([p[i] for p in pix_ids]) for i in range(len(nside))]
 	
