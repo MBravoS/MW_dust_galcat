@@ -8,7 +8,7 @@
 
 ##########################
 
-rm /fast_scratch2/mbravo/MWdust_data/*Buzzard* /fast_scratch2/mbravo/MWdust_plots/*Buzzard*
+rm /fast_scratch2/mbravo/MWdust_data_deep/*Buzzard* /fast_scratch2/mbravo/MWdust_plots_deep/*Buzzard*
 cd /home/mbravo/MW_dust_galcat
 
 D=lsst

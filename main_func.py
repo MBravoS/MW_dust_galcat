@@ -77,7 +77,7 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		####################
 		# Plots
 		####################
-		msize=6
+		msize=20
 		if nside[i]>65:
 			msize=1
 		
