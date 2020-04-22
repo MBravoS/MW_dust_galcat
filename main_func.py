@@ -111,30 +111,6 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
 		plot.tight_layout()
 		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_final.pdf')
-		
-		#plot.figure()
-		#for j in range(len(zrange)):
-		#	sp.scatter(Debv[j],ebv_from_delta[j],plabel=f'$\delta$, {z_label[j]}',c=f'C{j}',marker='d')
-		#	sp.scatter(Debv[j],ebv_from_mag[j],plabel=f'$u$, {z_label[j]}',c=f'C{j}',marker='*')
-		#	sp.scatter(Debv[j],ebv_from_col[j],plabel=f'$u-z$, {z_label[j]}',c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
-		#				ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
-		#sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
-		#plot.tight_layout()
-		#plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_full.pdf')
-		#
-		#plot.figure()
-		#for j in range(len(zrange)):
-		#	sp.scatter(Debv[j],EBV_recovery[j],plabel=z_label[j],c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
-		#				ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
-		#sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
-		#plot.tight_layout()
-		#plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_combined.pdf')
-		#
-		#plot.figure()
-		#sp.scatter(Debv[0],EBV_final,c='C0',xlabel='$\Delta E(B-V)_\mathrm{input}$',ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
-		#sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
-		#plot.tight_layout()
-		#plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_final.pdf')
 
 def dust_mapping2(pnames,dvec,nside,zrange,out_dir,plot_dir):
 	import aux_func
