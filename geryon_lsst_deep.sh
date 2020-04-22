@@ -23,4 +23,4 @@ Mc=26.0
 B1c=27.3
 B2c=27.2
 
-python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -mcut $Mc -b1cut $B1c -b2cut $B2c -n 64 512 -z 0.0 0.3 0.6 0.9 1.2 2.5 8.0
+python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -mcut $Mc -b1cut $B1c -b2cut $B2c -n 64 512 #-z 0.0 0.3 0.6 0.9 1.2 2.5 8.0

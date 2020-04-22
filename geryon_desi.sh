@@ -19,5 +19,7 @@ BC=True
 SDM=False
 M=56
 MS=r_ap
+B1c=27.3
+B2c=27.2
 
-python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -n 64 512
+python MW_dust_ext_calc.py -d $D -p $P -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -n 64 512 -b1cut $B1c -b2cut $B2c

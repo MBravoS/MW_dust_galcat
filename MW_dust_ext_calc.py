@@ -68,7 +68,7 @@ def main():
 	####################
 	# Addd errors
 	####################
-	#main_func.magz_err(fnames,multithread=opts.multithread)
+	main_func.magz_err(fnames,multithread=opts.multithread)
 	
 	####################
 	# Dust vector
