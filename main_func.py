@@ -212,9 +212,9 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	data=[]
 	for f in fnames:
 		print(f)
-		data.append(pd.read_csv(f))
-	data=pd.concat(data)
-	ebv=np.zeros(len(data))
+		temp=pd.read_csv(f)
+		data.append([temp.loc[(temp['zobs']>z[0])&(temp['zobs']<z[1])].copy() for z in zrange])
+	data=[pd.concat([data[j][i] for j in range(len(fnames))]) for i in range(len(zrange))]
 	
 	####################
 	# Extinction effect
@@ -227,13 +227,9 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	print('Calculating dust vectors')
 	if multithread:
 		pool=mp.Pool(processes=min(multithread,len(A_sel)))
-		vector_comp=[pool.apply(aux_func.dust_vector,(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
-														EBV,mag_cut,b1_cut,b2_cut, ebv[(data['zobs']>z[0])&(data['zobs']<z[1])],)) for z in zrange]
+		vector_comp=[pool.apply(aux_func.dust_vector,(d,band_sel,band_1,band_2,EBV,mag_cut,b1_cut,b2_cut,)) for d in data]
 	else:
-		vector_comp=[aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
-											EBV,mag_cut,b1_cut,b2_cut,ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in zrange]
-	#vector_comp=[aux_func.dust_vector(data.loc[(data['zobs']>z[0])&(data['zobs']<z[1])].copy(),band_sel,band_1,band_2,
-	#									EBV,mag_cut,b1_cut,b2_cut,ebv[(data['zobs']>z[0])&(data['zobs']<z[1])]) for z in zrange]
+		vector_comp=[aux_func.dust_vector(d,band_sel,band_1,band_2,EBV,mag_cut,b1_cut,b2_cut) for d in data]
 	
 	delta=[]
 	mag=[]
@@ -320,7 +316,6 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 		temp=[t.get() for t in temp]
 	else:
 		temp=[aux_func.pix_id(fnames[j],nside,ebv_map,j) for j in range(len(fnames))]
-	#temp=[aux_func.pix_id(fnames[j],nside,ebv_map,j) for j in range(len(fnames))]
 	
 	res=temp[0][0]
 	pix_ids=[t[1] for t in temp]

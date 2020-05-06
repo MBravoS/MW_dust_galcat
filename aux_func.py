@@ -3,16 +3,16 @@
 ########################################
 # Extinction vector calculation
 ########################################
-def dust_vector(data,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag_2_lim,ebv_map):
+def dust_vector(data,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag_2_lim)#,ebv_map):
 	import numpy as np
 	import pandas as pd
 	
 	mag_filt_list=[k for k in data.columns.values if k[-3:]=='_ap']
 	
-	if ebv_map is not None:
-		for mfl in mag_filt_list:
-			A_mfl,temp=extinction_law(ebv_map,mfl,band_1)
-			data[mfl]+=A_mfl
+	#if ebv_map is not None:
+	#	for mfl in mag_filt_list:
+	#		A_mfl,temp=extinction_law(ebv_map,mfl,band_1)
+	#		data[mfl]+=A_mfl
 	
 	mag_sel=data[band_sel]<mag_sel_lim
 	mag_sel&=data[band_1]<mag_1_lim
