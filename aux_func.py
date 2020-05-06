@@ -93,9 +93,11 @@ def magz_err_perfile(fname):
 	sigma={bands[i]:sigma_band[i] for i in range(5)}
 	for k in bands:
 		temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma[k],size=len(data)))
-		temp_mag=-2.5*np.log10(10**(-data[f'{k}_nodust']/2.5)+np.random.normal(loc=0,scale=sigma[f'{k}_nodust'],size=len(data)))
 		data.loc[~np.isnan(temp_mag),k]=temp_mag.loc[~np.isnan(temp_mag)]
 		data.loc[np.isnan(temp_mag),k]=99
+		temp_mag=-2.5*np.log10(10**(-data[f'{k}_nodust']/2.5)+np.random.normal(loc=0,scale=sigma[k],size=len(data)))
+		data.loc[~np.isnan(temp_mag),f'{k}_nodust']=temp_mag.loc[~np.isnan(temp_mag)]
+		data.loc[np.isnan(temp_mag),f'{k}_nodust']=99
 	
 	####################
 	# z errors

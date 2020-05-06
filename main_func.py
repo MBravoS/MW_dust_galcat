@@ -211,13 +211,12 @@ def magz_err(fnames,multithread):
 	import aux_func
 	import multiprocessing as mp
 	
-	#if multithread:
-	#	pool=mp.Pool(processes=min(multithread,len(fnames)))
-	#	temp=[pool.apply_async(aux_func.magz_err_perfile,(f,)) for f in fnames]
-	#	temp=[t.get() for t in temp]
-	#else:
-	#	temp=[aux_func.magz_err_perfile(f) for f in fnames]
-	temp=[aux_func.magz_err_perfile(f) for f in fnames]
+	if multithread:
+		pool=mp.Pool(processes=min(multithread,len(fnames)))
+		temp=[pool.apply_async(aux_func.magz_err_perfile,(f,)) for f in fnames]
+		temp=[t.get() for t in temp]
+	else:
+		temp=[aux_func.magz_err_perfile(f) for f in fnames]
 
 ########################################
 # Assign the galaxies to HEALPix pixels
