@@ -83,7 +83,6 @@ def magz_err_perfile(fname):
 	import pandas as pd
 	
 	data=pd.read_csv(fname)
-	print(data.columns.values)
 	
 	####################
 	# mag errors
