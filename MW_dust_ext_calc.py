@@ -26,8 +26,6 @@ def main():
 	
 	parser=argparse.ArgumentParser()
 	parser.add_argument('-d','--data_files',help='The galaxy catalogue to use. By default creates a simple test dataset.',default='test')
-	parser.add_argument('-p','--prepare_data',help='The function from aux_func to copy the data into the file scheme that the code uses.',
-						default=False,type=s2b)
 	parser.add_argument('-i','--in_dir',help='The input folder.',default='./')
 	parser.add_argument('-o','--out_dir',help='The output folder.',default='./')
 	parser.add_argument('-plt','--plot_dir',help='The plot folder.',default='./')
@@ -52,36 +50,40 @@ def main():
 	else:
 		opts.zbins=[[opts.zbins[i],opts.zbins[i+1]] for i in range(len(opts.zbins)-1)]
 	
-	#if not opts.input:
-	#	parser.error('An input is needed')
-	
 	####################
-	# Prepare data
+	# Read data
 	####################
 	path_dict={'test':'test','desi':'/fast_scratch1/mbravo/DESI/','lsst':'/fast_scratch1/mbravo/LSST/'}
-	if opts.prepare_data:
+	fname_dict={'desi':'GALFORM','lsst':'Buzzard'}
+	fnames=glob.glob(f'{opts.in_dir}/galaxies_{fname_dict[opts.data_files]}*csv')
+	data_exist=True
+	if len(fnames)==0:
 		fnames=getattr(data_func,opts.data_files)(path_dict[opts.data_files],opts.out_dir)
-	else:
-		fname_dict={'desi':'GALFORM','lsst':'Buzzard'}
-		fnames=glob.glob(f'{opts.in_dir}/galaxies_{fname_dict[opts.data_files]}*csv')
+		data_exist=False
 	
 	####################
-	# Addd errors
+	# Add errors
 	####################
-	main_func.magz_err(fnames,multithread=opts.multithread)
+	if not data_exist:
+		main_func.magz_err(fnames,multithread=opts.multithread)
 	
 	####################
 	# Dust vector
 	####################
-	dust_vector=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
-										mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
-										multithread=opts.multithread)
+	dust_vector=glob.glob(f'{opts.in_dir}/dust_vector_{fname_dict[opts.data_files]}*csv')
+	if len(dust_vector)>0:
+		dust_vector=[pd.read_csv(dv) for dv in sorted(dust_vector)]
+	else:
+		dust_vector=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
+											mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
+											multithread=opts.multithread)
 	
 	####################
 	# Pixelate data
 	####################
-	main_func.pixel_assign(fnames,opts.nside,border_check=opts.border_check,multithread=opts.multithread,
-							simple_ebv=opts.simple_dust_map)
+	if not data_exist:
+		main_func.pixel_assign(fnames,opts.nside,border_check=opts.border_check,multithread=opts.multithread,
+								simple_ebv=opts.simple_dust_map)
 	
 	####################
 	# Pixel properties
@@ -94,7 +96,6 @@ def main():
 	# Dust map
 	####################
 	main_func.dust_mapping(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
-	#main_func.dust_mapping2(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
 	
 	t1=time.time()
 	print(f'Total running time = {t1-t0} s')

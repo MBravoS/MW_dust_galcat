@@ -8,7 +8,7 @@ bands for the photometry'''
 # Create a simple test mock
 ########################################
 def test(temp,file_path):
-	import os
+	import time
 	import numpy as np
 	import pandas as pd
 	import healpy.pixelfunc as pf
@@ -72,6 +72,7 @@ def desi(in_path,out_path):
 	####################
 	# Reading CSV
 	####################
+	t0=time.time()
 	var_names=['id_galaxy_sam','id_galaxy_sky','zcos','zobs','BCDM','ra','dec','u_ap','u_ab','g_ap','g_ab','r_ap','r_ab','i_ap','i_ab','z_ap','z_ab']
 	data=pd.read_csv(f'{in_path}DESI_LC.csv',header=None,names=var_names)
 	data=data.drop(columns=['id_galaxy_sam','zcos','BCDM'])
@@ -87,7 +88,9 @@ def desi(in_path,out_path):
 		fnames.append(fname)
 		data_subset=data.loc[big_pixels==pix]
 		data_subset.to_csv(fname,index=False)
-	print('DESI/GALFORM data splitted')
+	
+	t1=time.time()
+	print(f'Data prepared in {t1-t0} s')
 	return(fnames)
 
 ########################################
@@ -128,10 +131,7 @@ def fits2csv(fits_name):
 	data=fit_table.to_pandas()
 	hdulist.close()
 	data['big_pix']=pf.ang2pix(32,theta=data['ra'],phi=data['dec'],lonlat=True,nest=False)
-	#big_pixel=fits_name.split('.')[1]
-	#csv_name=f'{data_dir}galaxies_Buzzard_{big_pixel}.csv'
-	#data.to_csv(csv_name,index=False)
-	return(data)#csv_name)
+	return(data)
 
 ####################
 # Read function
@@ -165,6 +165,6 @@ def lsst(in_path,out_path):
 			df_names.append(df_name)
 	
 	t1=time.time()
-	print(f'Running time to read and convert files = {t1-t0} s')
+	print(f'Data prepared in {t1-t0} s')
 	
 	return(df_names)
