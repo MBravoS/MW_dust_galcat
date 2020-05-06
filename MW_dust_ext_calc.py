@@ -62,6 +62,13 @@ def main():
 		data_exist=False
 	
 	####################
+	# Pixelate data
+	####################
+	if not data_exist:
+		main_func.pixel_assign(fnames,opts.nside,border_check=opts.border_check,multithread=opts.multithread,
+								simple_ebv=opts.simple_dust_map)
+	
+	####################
 	# Add errors
 	####################
 	if not data_exist:
@@ -77,13 +84,6 @@ def main():
 		dust_vector=main_func.dust_vector(fnames,opts.sel_band,opts.band1,opts.band2,opts.out_dir,opts.plot_dir,opts.zbins,
 											mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
 											multithread=opts.multithread)
-	
-	####################
-	# Pixelate data
-	####################
-	if not data_exist:
-		main_func.pixel_assign(fnames,opts.nside,border_check=opts.border_check,multithread=opts.multithread,
-								simple_ebv=opts.simple_dust_map)
 	
 	####################
 	# Pixel properties

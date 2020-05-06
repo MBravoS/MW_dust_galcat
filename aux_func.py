@@ -7,7 +7,7 @@ def dust_vector(data,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag_2
 	import numpy as np
 	import pandas as pd
 	
-	mag_filt_list=[k for k in data.columns.values if k[-3:]=='_ap']
+	mag_filt_list=[k for k in data.columns.values if k[-3:]=='_ap_nodust']
 	
 	mag_sel=data[band_sel]<mag_sel_lim
 	mag_sel&=data[band_1]<mag_1_lim
@@ -92,19 +92,26 @@ def magz_err_perfile(fname):
 	sigma={bands[i]:sigma_band[i] for i in range(5)}
 	for k in bands:
 		temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma[k],size=len(data)))
-		data[f'{k}_sim']=data[k]*1.0
+		temp_mag=-2.5*np.log10(10**(-data[f'{k}_nodust']/2.5)+np.random.normal(loc=0,scale=sigma[f'{k}_nodust'],size=len(data)))
 		data.loc[~np.isnan(temp_mag),k]=temp_mag.loc[~np.isnan(temp_mag)]
 		data.loc[np.isnan(temp_mag),k]=99
 	
 	####################
 	# z errors
 	####################
+	data['zobs_sim']=data['zobs']*1.0
+	
 	zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
 	zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap']-25.3))),size=len(data))
 	zerr_i_sel=data['i_ap']>25.3
 	zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
-	data['zobs_sim']=data['zobs']*1.0
-	data['zobs']=data['zobs']+(1+data['zobs'])*zerr_sigma
+	data['zobs']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
+	
+	zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
+	zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap_nodust']-25.3))),size=len(data))
+	zerr_i_sel=data['i_ap_nodust']>25.3
+	zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
+	data['zobs_nodust']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
 	
 	data.to_csv(fname)
 
@@ -131,7 +138,12 @@ def pix_id(fname,nside,sfd_map,seed):
 		pix_ebv=np.zeros(len(pix))
 		for pid in uniqpix:
 			pix_ebv[pix==pid]=sfd_map_sample[pid]
-		csv_data[f'{col_name}_SFDmap']=pix_ebv#sfd_map[i][pix]
+		csv_data[f'{col_name}_SFDmap']=pix_ebv
+		mag_filt_list=[k for k in csv_data.columns.values if k[-3:]=='_ap']
+		for mfl in mag_filt_list:
+			A_mfl,temp=extinction_law(csv_data[f'{col_name}_SFDmap'],mfl,mag_filt_list[0])
+			csv_data[f'{mfl}_nodust']=csv_data[mfl]
+			csv_data[mfl]+=A_mfl
 		pix_ids.append(uniqpix)
 	csv_data.to_csv(fname,index=False)
 	return(col_names,pix_ids)
@@ -168,18 +180,11 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck):
 			
 			if n_nonborder>0:
 				####################
-				# Add extinction
+				# Apply mag limits
 				####################
-				mag_filt_list=[k for k in data_sel.columns.values if k[-3:]=='_ap']
-				
-				for mfl in mag_filt_list:
-					A_mfl,temp=extinction_law(data_sel[f'{nside_key}_SFDmap'],mfl,b1)
-					data_sel[mfl]+=A_mfl
-				
 				mag_sel=data_sel[bsel]<mcut
 				mag_sel&=data_sel[b1]<b1cut
 				mag_sel&=data_sel[b2]<b2cut
-				
 				data_sel=data_sel.loc[mag_sel]
 				
 				####################

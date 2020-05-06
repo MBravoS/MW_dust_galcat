@@ -117,75 +117,6 @@ def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
 	t1=time.time()
 	print(f'Dust map recovered in {t1-t0} s')
 
-#def dust_mapping2(pnames,dvec,nside,zrange,out_dir,plot_dir):
-#	import aux_func
-#	import numpy as np
-#	import pandas as pd
-#	import splotch as sp
-#	import scipy.optimize as opti
-#	import matplotlib.pyplot as plot
-#	import scipy.interpolate as interp
-#	
-#	for i in range(len(nside)):
-#		ns=nside[i]
-#		nside_key=f'n{np.log2(ns):.0f}'
-#		data=pd.concat([pd.read_csv(p) for p in pnames if nside_key in p],ignore_index=True)
-#		EBV_recovery=[]
-#		z_label=[]
-#		for j in range(len(zrange)):
-#			zr=zrange[j]
-#			z_key=f'z{np.sum(zr)/2:.2f}'.replace('.','')
-#			
-#			####################
-#			# Delta calc
-#			####################
-#			delta=data[f'{nside_key}_{z_key}_count']+np.random.uniform(-0.5,0.5,len(data))
-#			data[f'{nside_key}_{z_key}_delta']=np.log10(delta/np.mean(delta))
-#			
-#			####################
-#			# Read dust vector
-#			####################
-#			dust_vector=pd.read_csv(f'{out_dir}dust_vector_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}_dusted.csv')
-#			dust_vector,ebv2d,ebv2m,ebv2c=aux_func.slope2(dust_vector,np.array(data[f'{nside_key}_EBV']))
-#			
-#			ebv_from_delta=(data[f'{nside_key}_{z_key}_delta']-np.median(data[f'{nside_key}_{z_key}_delta']))/ebv2d
-#			ebv_from_mag=(data[f'{nside_key}_{z_key}_mag']-np.median(data[f'{nside_key}_{z_key}_mag']))/ebv2m
-#			ebv_from_col=(data[f'{nside_key}_{z_key}_col']-np.median(data[f'{nside_key}_{z_key}_col']))/ebv2c
-#			
-#			spl_delta=interp.UnivariateSpline(dust_vector['deltaEBV'],dust_vector['delta'])
-#			spl_mag=interp.UnivariateSpline(dust_vector['deltaEBV'],dust_vector['mag'])
-#			spl_col=interp.UnivariateSpline(dust_vector['deltaEBV'],dust_vector['col'])
-#			
-#			#sp.plot([dust_vector['deltaEBV']]*3,
-#			#		[spl_delta(dust_vector['deltaEBV']),spl_mag(dust_vector['deltaEBV']),spl_col(dust_vector['deltaEBV'])],
-#			#		plabel=['d','m','c'])
-#			#plot.show()
-#			
-#			def dist(val,D,M,C):
-#				dd=spl_delta(val)
-#				mm=spl_mag(val)
-#				cc=spl_col(val)
-#				return(((D-dd)**2+(M-mm)**2+(C-cc)**2)**0.5)
-#			
-#			ebv_recover=np.zeros(len(ebv_from_delta))
-#			for k in range(len(ebv_from_delta)):
-#				ebv_recover[k]=opti.minimize(dist,x0=0.0,args=(ebv_from_delta[k],ebv_from_mag[k],ebv_from_col[k])).x
-#			
-#			EBV_recovery.append(ebv_recover)
-#			z_label.append(z_key)
-#		
-#		####################
-#		# Plots
-#		####################
-#		plot.figure()
-#		
-#		for j in range(len(zrange)):
-#			sp.scatter(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']),EBV_recovery[j]+0.1,plabel=z_label[j],c=f'C{j}',
-#						xlabel='$\Delta E(B-V)_\mathrm{input}$',ylabel='$\Delta E(B-V)_\mathrm{recovered}$')
-#		sp.axline(m=1,plabel='1:1',color='k',linestyle='dashed')
-#		plot.tight_layout()
-#		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}.pdf')
-
 ########################################
 # Dust vector calculation
 ########################################
@@ -213,7 +144,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	for f in fnames:
 		print(f)
 		temp=pd.read_csv(f)
-		data.append([temp.loc[(temp['zobs']>z[0])&(temp['zobs']<z[1])].copy() for z in zrange])
+		data.append([temp.loc[(temp['zobs_nodust']>z[0])&(temp['zobs_nodust']<z[1])].copy() for z in zrange])
 	data=[pd.concat([data[j][i] for j in range(len(fnames))]) for i in range(len(zrange))]
 	
 	####################
