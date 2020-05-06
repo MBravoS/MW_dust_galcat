@@ -19,7 +19,7 @@ MS=r_ap
 B1c=27.3
 B2c=27.2
 
-if [$clean -equal 1]
+if [ $clean -eq 1 ]
 then
 	rm /fast_scratch2/mbravo/MWdust_data/*GALFORM* 
 fi
