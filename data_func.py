@@ -65,6 +65,7 @@ def test(temp,file_path):
 # Read the DESI LC made with GALFORM
 ########################################
 def desi(in_path,out_path):
+	import time
 	import numpy as np
 	import pandas as pd
 	import healpy.pixelfunc as pf
