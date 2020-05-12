@@ -24,7 +24,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag
 	for i in range(len(ebv_test)):
 		dusted_data=data.copy()
 		for mfl in mag_filt_list:
-			A_mfl,temp=extinction_law(ebv_test[i],mfl,band_1)
+			A_mfl,temp=extinction_law(ebv_test[i],mfl.replace('_nodust',''),band_1.replace('_nodust',''))
 			dusted_data[mfl]+=A_mfl
 			
 		mag_sel=(dusted_data[band_sel]<mag_sel_lim)

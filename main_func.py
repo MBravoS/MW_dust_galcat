@@ -145,10 +145,6 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 		data=[pool.apply(aux_func.zsplit,(f,zrange)) for f in fnames]
 	else:
 		data=[aux_func.zsplit(f,zrange) for f in fnames]
-	#data=[]
-	#for f in fnames:
-	#	#data.append([temp.loc[(temp['zobs_nodust']>z[0])&(temp['zobs_nodust']<z[1])].copy() for z in zrange])
-	#data=[pd.concat([data[j][i] for j in range(len(fnames))]) for i in range(len(zrange))]
 	
 	####################
 	# Extinction effect
@@ -161,9 +157,11 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	print('Calculating dust vectors')
 	if multithread:
 		pool=mp.Pool(processes=min(multithread,len(A_sel)))
-		vector_comp=[pool.apply(aux_func.dust_vector,(d,band_sel,band_1,band_2,EBV,mag_cut,b1_cut,b2_cut,)) for d in data]
+		vector_comp=[pool.apply(aux_func.dust_vector,(d,f'{band_sel}_nodust',f'{band_1}_nodust',
+														f'{band_2}_nodust',EBV,mag_cut,b1_cut,b2_cut,)) for d in data]
 	else:
-		vector_comp=[aux_func.dust_vector(d,band_sel,band_1,band_2,EBV,mag_cut,b1_cut,b2_cut) for d in data]
+		vector_comp=[aux_func.dust_vector(d,f'{band_sel}_nodust',f'{band_1}_nodust',
+											f'{band_2}_nodust',EBV,mag_cut,b1_cut,b2_cut)) for d in data]
 	
 	delta=[]
 	mag=[]
