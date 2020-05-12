@@ -132,7 +132,6 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	
 	sp.use_style('splotch.style')
 	fs=np.array(plot.rcParams.get('figure.figsize'))
-	fd=''
 	
 	####################
 	# Reading data in
@@ -200,7 +199,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	sp.plot(EBV,col,c=cr,xlabel='E(B-V) [mag]',ylabel=f'$\Delta({band_1[0]}-{band_2[0]})$ [mag]')
 	sp.plot(EBV[0],E_b1b2,c='k',linestyle='dashed',plabel=f'E$({band_1[0]}-{band_2[0]})$ [mag]')
 	plot.tight_layout()
-	plot.savefig(f'{plot_dir}dust_vector_{run_name}{fd}.pdf')
+	plot.savefig(f'{plot_dir}dust_vector_{run_name}.pdf')
 	plot.close()
 	
 	t1=time.time()
