@@ -285,3 +285,15 @@ def slope2(dust_comp,ebvmap,dusted=False):
 	#dust_comp['col']/=mc
 	
 	return(dust_comp,md,mm,mc)
+
+def zsplit(f,zr):
+	import pandas as pd
+	
+	temp_csv=pd.read_csv(f)
+	temp_names=[]
+	for z in zr:
+		temp_name=f.replace('galaxies',f'temp_z{(z[0]+z[1])/2:.2f}'.replace('.',''))
+		temp_subset=temp_csv.loc[(temp_csv['zobs_nodust']>z[0])&(temp_csv['zobs_nodust']<z[1])]
+		temp_subset.to_csv(temp_name,index=False)
+		temp_names.append(temp_name)
+	return(temp_names)
