@@ -161,7 +161,7 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 														f'{band_2}_nodust',EBV,mag_cut,b1_cut,b2_cut,)) for d in data]
 	else:
 		vector_comp=[aux_func.dust_vector(d,f'{band_sel}_nodust',f'{band_1}_nodust',
-											f'{band_2}_nodust',EBV,mag_cut,b1_cut,b2_cut)) for d in data]
+											f'{band_2}_nodust',EBV,mag_cut,b1_cut,b2_cut) for d in data]
 	
 	delta=[]
 	mag=[]

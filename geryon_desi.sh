@@ -28,4 +28,4 @@ rm /fast_scratch2/mbravo/MWdust_plots/*GALFORM*
 cd /home/mbravo/MW_dust_galcat
 python MW_dust_ext_calc.py -d $D -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -n 64 512 -b1cut $B1c -b2cut $B2c
 
-#rm /fast_scratch2/mbravo/MWdust_data/*temp*GALFORM*
+rm /fast_scratch2/mbravo/MWdust_data/*temp*GALFORM*
