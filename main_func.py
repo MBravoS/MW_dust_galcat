@@ -140,12 +140,17 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	t0=time.time()
 	print('Reading galaxy data for dust vector calculation')
 	run_name=fnames[0].split("galaxies_")[1].split('_')[0]
-	data=[]
+	data=[[] for z in zrange]
 	for f in fnames:
-		print(f)
-		temp=pd.read_csv(f)
-		data.append([temp.loc[(temp['zobs_nodust']>z[0])&(temp['zobs_nodust']<z[1])].copy() for z in zrange])
-	data=[pd.concat([data[j][i] for j in range(len(fnames))]) for i in range(len(zrange))]
+		temp_csv=pd.read_csv(f)
+		for i in range(len(zrange)):
+			z=zrange[i]
+			temp_name=f.replace('galaxies',f'temp_z{(z[0]+z[1])/2:.2f}'.replace('.',''))
+			temp_subset=temp_csv.loc[(temp_csv['zobs_nodust']>z[0])&(temp_csv['zobs_nodust']<z[1])]
+			temp_subset.to_csv(temp_name,index=False)
+			data[i].append(temp_name)
+		#data.append([temp.loc[(temp['zobs_nodust']>z[0])&(temp['zobs_nodust']<z[1])].copy() for z in zrange])
+	#data=[pd.concat([data[j][i] for j in range(len(fnames))]) for i in range(len(zrange))]
 	
 	####################
 	# Extinction effect

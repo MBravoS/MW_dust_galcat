@@ -3,16 +3,16 @@
 ########################################
 # Extinction vector calculation
 ########################################
-def dust_vector(data,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag_2_lim):
+def dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag_2_lim):
 	import numpy as np
 	import pandas as pd
 	
-	mag_filt_list=[k for k in data.columns.values if k[-3:]=='_ap_nodust']
+	data=pd.concat([pd.read_csv(f) for f in fnames])
 	
+	mag_filt_list=[k for k in data.columns.values if k[-3:]=='_ap_nodust']
 	mag_sel=data[band_sel]<mag_sel_lim
 	mag_sel&=data[band_1]<mag_1_lim
 	mag_sel&=data[band_2]<mag_2_lim
-	
 	data=data.loc[mag_sel]
 	
 	base_n=1.0*len(data)
