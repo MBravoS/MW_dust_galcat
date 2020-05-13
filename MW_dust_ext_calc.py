@@ -69,6 +69,13 @@ def main():
 								simple_ebv=opts.simple_dust_map)
 	
 	####################
+	# Intrinsic pixels
+	####################
+	pnames=main_func.pixel_stat(fnames,opts.nside,opts.sel_band,opts.band1,opts.band2,opts.zbins,
+								mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
+								border_check=opts.border_check,intrinsic=True,multithread=opts.multithread)
+	
+	####################
 	# Add errors
 	####################
 	if not data_exist:
