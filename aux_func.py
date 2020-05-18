@@ -10,7 +10,6 @@ def dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag
 	data=pd.concat([pd.read_csv(f) for f in fnames])
 	
 	mag_filt_list=[k for k in data.columns.values if 'ap_nodust' in k]
-	print(mag_filt_list)
 	mag_sel=data[band_sel]<mag_sel_lim
 	mag_sel&=data[band_1]<mag_1_lim
 	mag_sel&=data[band_2]<mag_2_lim
@@ -162,11 +161,7 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic=False):
 	data_full=pd.read_csv(fname)
 	pixel_name=[]
 	
-	if bcheck:
-		print(f'Will enforce borders for {fname.split("/")[-1]}')
-	
 	for ns in nside:
-		print('Assembling dataframe')
 		pixel_df={}
 		nside_key=f'n{np.log2(ns):.0f}'
 		for z in zr:
@@ -206,7 +201,7 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic=False):
 				pixel_df[f'{nside_key}_{z_key}_col']=col
 				pname=fname.replace('galaxies',f'pixel_{nside_key}')
 				if intrinsic:
-					pname=pname.replace('pixel_{nside_key}',f'pixel_{nside_key}_intrinsic')
+					pname=pname.replace(f'pixel_{nside_key}',f'pixel_{nside_key}_intrinsic')
 				pd.DataFrame(pixel_df).to_csv(pname,index=False)
 				pixel_name.append(pname)
 			else:
