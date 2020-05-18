@@ -142,9 +142,10 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	run_name=fnames[0].split("galaxies_")[1].split('_')[0]
 	if multithread:
 		pool=mp.Pool(processes=min(multithread,len(zrange)))
-		data=[pool.apply(aux_func.zsplit,(f,zrange)) for f in fnames]
+		temp=[pool.apply(aux_func.zsplit,(f,zrange)) for f in fnames]
 	else:
-		data=[aux_func.zsplit(f,zrange) for f in fnames]
+		temp=[aux_func.zsplit(f,zrange) for f in fnames]
+	data=[[temp[j][i] for j in range(len(fnames))] for i in range(len(zrange))]
 	
 	####################
 	# Extinction effect

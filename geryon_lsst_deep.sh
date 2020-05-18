@@ -28,3 +28,5 @@ rm /fast_scratch2/mbravo/MWdust_plots_deep/*Buzzard*
 
 cd /home/mbravo/MW_dust_galcat
 python MW_dust_ext_calc.py -d $D -o $O -plt $PLT -bc $BC -sdm $SDM -m $M -ms $MS -mcut $Mc -b1cut $B1c -b2cut $B2c -n 64 512
+
+rm /fast_scratch2/mbravo/MWdust_data_deep/*temp*Buzzard*
