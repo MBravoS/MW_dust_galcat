@@ -202,8 +202,15 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic=False):
 				pname=fname.replace('galaxies',f'pixel_{nside_key}')
 				if intrinsic:
 					pname=pname.replace(f'pixel_{nside_key}',f'pixel_{nside_key}_intrinsic')
-				pd.DataFrame(pixel_df).to_csv(pname,index=False)
-				pixel_name.append(pname)
+				try:
+					pd.DataFrame(pixel_df).to_csv(pname,index=False)
+					pixel_name.append(pname)
+				except ValueError:
+					outstr=f'File {pname.split("/")[-1]} failed'
+					for k in pixel_df.keys():
+						outstr=f'{outstr}\n    Column {k} has {len(pixel_df[k])} elements'
+					pixel_name.append()
+					
 			else:
 				pixel_name.append(None)
 	

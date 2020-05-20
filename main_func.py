@@ -295,6 +295,10 @@ def pixel_stat(fnames,nside,band_sel,band_1,band_2,zrange,mag_cut=24.8,b1_cut=99
 		results=[aux_func.pix_stat(f,nside,band_sel,band_1,band_2,mag_cut,b1_cut,b2_cut,zrange,border_check,intrinsic) for f in fnames]
 	
 	results=[r2 for r1 in results for r2 in r1 if r2 is not None]
+	for r in results:
+		if ' failed' in r:
+			print(r)
+	results=[r for r in results if ' failed' not in r]
 	
 	t1=time.time()
 	print(f'Pixel statistics finished in {t1-t0} s')
