@@ -87,33 +87,33 @@ def magz_err_perfile(fname):
 	####################
 	# mag errors
 	####################
-	#bands=['u_ap','g_ap','r_ap','i_ap','z_ap']
-	#sigma_band=np.array([6.0399,2.0000,1.6635,3.168,6.6226])*1e-12
-	#sigma={bands[i]:sigma_band[i] for i in range(5)}
-	#for k in bands:
-	#	temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma[k],size=len(data)))
-	#	data.loc[~np.isnan(temp_mag),k]=temp_mag.loc[~np.isnan(temp_mag)]
-	#	data.loc[np.isnan(temp_mag),k]=99
-	#	temp_mag=-2.5*np.log10(10**(-data[f'{k}_nodust']/2.5)+np.random.normal(loc=0,scale=sigma[k],size=len(data)))
-	#	data.loc[~np.isnan(temp_mag),f'{k}_nodust']=temp_mag.loc[~np.isnan(temp_mag)]
-	#	data.loc[np.isnan(temp_mag),f'{k}_nodust']=99
-	#
-	#####################
-	## z errors
-	#####################
-	#data['zobs_sim']=data['zobs']*1.0
-	#
-	#zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
-	#zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap']-25.3))),size=len(data))
-	#zerr_i_sel=data['i_ap']>25.3
-	#zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
-	#data['zobs']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
-	#
-	#zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
-	#zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap_nodust']-25.3))),size=len(data))
-	#zerr_i_sel=data['i_ap_nodust']>25.3
-	#zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
-	#data['zobs_nodust']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
+	bands=['u_ap','g_ap','r_ap','i_ap','z_ap']
+	sigma_band=np.array([6.0399,2.0000,1.6635,3.168,6.6226])*1e-12
+	sigma={bands[i]:sigma_band[i] for i in range(5)}
+	for k in bands:
+		temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma[k],size=len(data)))
+		data.loc[~np.isnan(temp_mag),k]=temp_mag.loc[~np.isnan(temp_mag)]
+		data.loc[np.isnan(temp_mag),k]=99
+		temp_mag=-2.5*np.log10(10**(-data[f'{k}_nodust']/2.5)+np.random.normal(loc=0,scale=sigma[k],size=len(data)))
+		data.loc[~np.isnan(temp_mag),f'{k}_nodust']=temp_mag.loc[~np.isnan(temp_mag)]
+		data.loc[np.isnan(temp_mag),f'{k}_nodust']=99
+	
+	####################
+	# z errors
+	####################
+	data['zobs_sim']=data['zobs']*1.0
+	
+	zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
+	zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap']-25.3))),size=len(data))
+	zerr_i_sel=data['i_ap']>25.3
+	zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
+	data['zobs']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
+	
+	zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
+	zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap_nodust']-25.3))),size=len(data))
+	zerr_i_sel=data['i_ap_nodust']>25.3
+	zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
+	data['zobs_nodust']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
 	
 	data.to_csv(fname)
 
@@ -160,6 +160,11 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic=False):
 	
 	data_full=pd.read_csv(fname)
 	pixel_name=[]
+	
+	if intrinsic:
+		bsel=f'{bsel}_nodust'
+		b1=f'{b1}_nodust'
+		b2=f'{b2}_nodust'
 	
 	for ns in nside:
 		pixel_df={}
