@@ -143,8 +143,8 @@ def pix_id(fname,nside,sfd_map,seed):
 		csv_data[f'{col_name}_SFDmap']=pix_ebv
 		mag_filt_list=[k for k in csv_data.columns.values if k[-3:]=='_ap']
 		for mfl in mag_filt_list:
-			A_mfl,temp=extinction_law(csv_data[f'{col_name}_SFDmap'],mfl,mag_filt_list[0])
-			csv_data[f'{mfl}_nodust']=csv_data[mfl]*1.0
+			A_mfl,temp=extinction_law(csv_data[f'{col_name}_SFDmap'].to_numpy(),mfl,mag_filt_list[0])
+			csv_data[f'{mfl}_nodust']=csv_data[mfl].to_numpy()*1.0
 			csv_data[mfl]+=A_mfl
 		pix_ids.append(uniqpix)
 	csv_data.to_csv(fname,index=False)
