@@ -128,6 +128,7 @@ def pix_id(fname,nside,sfd_map,seed):
 	csv_data=pd.read_csv(fname)
 	col_names=[]
 	pix_ids=[]
+	value_check=''
 	for i in range(len(nside)):
 		col_name=f'n{np.log2(nside[i]):.0f}'
 		col_names.append(col_name)
@@ -146,9 +147,11 @@ def pix_id(fname,nside,sfd_map,seed):
 			A_mfl,temp=extinction_law(csv_data[f'{col_name}_SFDmap'].to_numpy(),mfl,mag_filt_list[0])
 			csv_data[f'{mfl}_nodust']=csv_data[mfl].to_numpy()*1.0
 			csv_data[mfl]+=A_mfl
+			if np.sum(csv_data[mfl]-csv_data[f'{mfl}_nodust']):
+				value_check=f'{value_check}Before and after dust mags are equal in {mfl} for file {fname}'
 		pix_ids.append(uniqpix)
 	csv_data.to_csv(fname,index=False)
-	return(col_names,pix_ids)
+	return(col_names,pix_ids,value_check)
 	
 ########################################
 # Calculate the pixel properties
