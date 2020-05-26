@@ -156,7 +156,7 @@ def pix_id(fname,nside,sfd_map,seed):
 ########################################
 # Calculate the pixel properties
 ########################################
-def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic=False):
+def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic):
 	import numpy as np
 	import pandas as pd
 	import scipy.stats as stats
@@ -168,6 +168,7 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic=False):
 		bsel=f'{bsel}_nodust'
 		b1=f'{b1}_nodust'
 		b2=f'{b2}_nodust'
+	print(bsel,b1,b2)
 	
 	for ns in nside:
 		pixel_df={}
