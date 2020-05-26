@@ -253,11 +253,11 @@ def pixel_assign(fnames,nside,border_check=False,simple_ebv=True,multithread=Fal
 	res=temp[0][0]
 	pix_ids=[t[1] for t in temp]
 	pix_ids=[np.concatenate([p[i] for p in pix_ids]) for i in range(len(nside))]
-	value_check=''
-	for t in temp:
-		value_check=f'{value_check}{t[2]}'
-	if len(value_check)>1:
-		print(value_check)
+	#value_check=''
+	#for t in temp:
+	#	value_check=f'{value_check}{t[2]}'
+	#if len(value_check)>1:
+	#	print(value_check)
 	
 	####################
 	# Border check
