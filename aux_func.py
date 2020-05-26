@@ -148,7 +148,7 @@ def pix_id(fname,nside,sfd_map,seed):
 			csv_data[f'{mfl}_nodust']=csv_data[mfl].to_numpy()*1.0
 			csv_data[mfl]+=A_mfl
 			print(f'Mean diff before-after: {np.mean(csv_data[mfl]-csv_data[mfl+"_nodust"]):.3f}')
-			print(f'Mean map: {np.mean(csv_data[f'{col_name}_SFDmap']):.3f}')
+			print(f'Mean map: {np.mean(csv_data[col_name+"_SFDmap']):.3f}')
 			#if np.sum(csv_data[mfl]-csv_data[f'{mfl}_nodust'])==0:
 			#	value_check=f'{value_check}Before and after dust mags are equal in {mfl} for file {fname}\n'
 		pix_ids.append(uniqpix)
