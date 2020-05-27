@@ -128,7 +128,6 @@ def pix_id(fname,nside,sfd_map,seed):
 	csv_data=pd.read_csv(fname)
 	col_names=[]
 	pix_ids=[]
-	#value_check=''
 	for i in range(len(nside)):
 		col_name=f'n{np.log2(nside[i]):.0f}'
 		col_names.append(col_name)
@@ -147,13 +146,9 @@ def pix_id(fname,nside,sfd_map,seed):
 			A_mfl,temp=extinction_law(csv_data[f'{col_name}_SFDmap'].to_numpy(),mfl,mag_filt_list[0])
 			csv_data[f'{mfl}_nodust']=csv_data[mfl].to_numpy()*1.0
 			csv_data[mfl]+=A_mfl
-			print(f'Mean diff before-after: {np.mean(csv_data[mfl]-csv_data[mfl+"_nodust"]):.3f}')
-			print(f'Mean map: {np.mean(csv_data[col_name+"_SFDmap"]):.3f}')
-			#if np.sum(csv_data[mfl]-csv_data[f'{mfl}_nodust'])==0:
-			#	value_check=f'{value_check}Before and after dust mags are equal in {mfl} for file {fname}\n'
 		pix_ids.append(uniqpix)
 	csv_data.to_csv(fname,index=False)
-	return(col_names,pix_ids)#,value_check)
+	return(col_names,pix_ids)
 	
 ########################################
 # Calculate the pixel properties
@@ -204,6 +199,11 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic):
 				mag=stats.binned_statistic(data_sel[nside_key],data_sel[b1],statistic='median',bins=histogram_bins)[0]
 				col=stats.binned_statistic(data_sel[nside_key],data_sel[b1]-data_sel[b2],statistic='median',bins=histogram_bins)[0]
 				ebv=stats.binned_statistic(data_sel[nside_key],data_sel[f'{nside_key}_SFDmap'],statistic='median',bins=histogram_bins)[0]
+				
+				if intrinsic:
+					print(np.mean(data_sel[b1]-data_sel[b1.replace('_nodust','')]))
+				else:
+					print(np.mean(data_sel[f'{b1}_nodust']-data_sel[b1]))
 				
 				pixel_df[f'{nside_key}_pixID']=bin_id
 				pixel_df[f'{nside_key}_EBV']=ebv
