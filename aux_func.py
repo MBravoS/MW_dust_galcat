@@ -146,6 +146,7 @@ def pix_id(fname,nside,sfd_map,seed):
 			csv_data[f'{mfl}_{col_name}']=csv_data[f'{mfl}']+A_mfl
 		pix_ids.append(uniqpix)
 	csv_data.rename(columns={mfl:f'{mfl}_nodust' for mfl in mag_filt_list})
+	print(csv_data.columns.names)
 	csv_data.to_csv(fname,index=False)
 	return(col_names,pix_ids)
 	
