@@ -78,7 +78,7 @@ def find_border(fname,pix_list,nside,res):
 ########################################
 # Add observational errors per file
 ########################################
-def magz_err_perfile(fname):
+def magz_err_perfile(fname,nside):
 	import numpy as np
 	import pandas as pd
 	
