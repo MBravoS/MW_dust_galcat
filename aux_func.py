@@ -145,6 +145,7 @@ def pix_id(fname,nside,sfd_map,seed):
 			A_mfl,temp=extinction_law(csv_data[f'{col_name}_SFDmap'].to_numpy(),mfl,mag_filt_list[0])
 			csv_data[f'{mfl}_{col_name}']=csv_data[f'{mfl}']+A_mfl
 		pix_ids.append(uniqpix)
+	print({mfl:f'{mfl}_nodust' for mfl in mag_filt_list})
 	csv_data.rename(columns={mfl:f'{mfl}_nodust' for mfl in mag_filt_list})
 	print(csv_data.columns.values)
 	csv_data.to_csv(fname,index=False)
