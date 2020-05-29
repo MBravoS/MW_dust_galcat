@@ -209,16 +209,16 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 ########################################
 # Add observational errors to galaxies
 ########################################
-def magz_err(fnames,multithread):
+def magz_err(fnames,nside,multithread):
 	import aux_func
 	import multiprocessing as mp
 	
 	if multithread:
 		pool=mp.Pool(processes=min(multithread,len(fnames)))
-		temp=[pool.apply_async(aux_func.magz_err_perfile,(f,)) for f in fnames]
+		temp=[pool.apply_async(aux_func.magz_err_perfile,(f,nside,)) for f in fnames]
 		temp=[t.get() for t in temp]
 	else:
-		temp=[aux_func.magz_err_perfile(f) for f in fnames]
+		temp=[aux_func.magz_err_perfile(f,nside) for f in fnames]
 
 ########################################
 # Assign the galaxies to HEALPix pixels

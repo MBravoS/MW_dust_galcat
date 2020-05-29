@@ -90,24 +90,23 @@ def magz_err_perfile(fname):
 	bands=['u_ap','g_ap','r_ap','i_ap','z_ap']
 	sigma_band=np.array([6.0399,2.0000,1.6635,3.168,6.6226])*1e-12
 	sigma={bands[i]:sigma_band[i] for i in range(5)}
-	for k in bands:
-		temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma[k],size=len(data)))
+	file_bands=[k for k in data.columns.values if '_ap_' in k]
+	for k in file_bands:
+		temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma[k[:4]],size=len(data)))
 		data.loc[~np.isnan(temp_mag),k]=temp_mag.loc[~np.isnan(temp_mag)]
 		data.loc[np.isnan(temp_mag),k]=99
-		temp_mag=-2.5*np.log10(10**(-data[f'{k}_nodust']/2.5)+np.random.normal(loc=0,scale=sigma[k],size=len(data)))
-		data.loc[~np.isnan(temp_mag),f'{k}_nodust']=temp_mag.loc[~np.isnan(temp_mag)]
-		data.loc[np.isnan(temp_mag),f'{k}_nodust']=99
 	
 	####################
 	# z errors
 	####################
 	data['zobs_sim']=data['zobs']*1.0
 	
-	zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
-	zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap']-25.3))),size=len(data))
-	zerr_i_sel=data['i_ap']>25.3
-	zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
-	data['zobs']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
+	for n in np.log2(nside):
+		zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
+		zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data[f'i_ap_n{n:.0f}']-25.3))),size=len(data))
+		zerr_i_sel=data[f'i_ap_n{n:.0f}']>25.3
+		zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
+		data[f'zobs_n{n:.0f}']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
 	
 	zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
 	zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap_nodust']-25.3))),size=len(data))
@@ -128,6 +127,7 @@ def pix_id(fname,nside,sfd_map,seed):
 	csv_data=pd.read_csv(fname)
 	col_names=[]
 	pix_ids=[]
+	mag_filt_list=[k for k in csv_data.columns.values if k[-3:]=='_ap']
 	for i in range(len(nside)):
 		col_name=f'n{np.log2(nside[i]):.0f}'
 		col_names.append(col_name)
@@ -141,13 +141,11 @@ def pix_id(fname,nside,sfd_map,seed):
 		for pid in uniqpix:
 			pix_ebv[pix==pid]=sfd_map_sample[pid]
 		csv_data[f'{col_name}_SFDmap']=pix_ebv
-		mag_filt_list=[k for k in csv_data.columns.values if k[-3:]=='_ap']
 		for mfl in mag_filt_list:
 			A_mfl,temp=extinction_law(csv_data[f'{col_name}_SFDmap'].to_numpy(),mfl,mag_filt_list[0])
-			csv_data[f'{mfl}_nodust']=csv_data[mfl].to_numpy()*1.0
-			csv_data[mfl]+=A_mfl
-			#print(np.std(csv_data[f'{mfl}_nodust']-csv_data[mfl]))
+			csv_data[f'{mfl}_{col_name}']=csv_data[f'{mfl}_nodust']+A_mfl
 		pix_ids.append(uniqpix)
+	csv_data.rename(columns={mfl:f'{mfl}_nodust' for mfl in mag_filt_list})
 	csv_data.to_csv(fname,index=False)
 	return(col_names,pix_ids)
 	
@@ -162,15 +160,17 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic):
 	data_full=pd.read_csv(fname)
 	pixel_name=[]
 	
-	if intrinsic:
-		bsel=f'{bsel}_nodust'
-		b1=f'{b1}_nodust'
-		b2=f'{b2}_nodust'
-	print(bsel,b1,b2)
-	
 	for ns in nside:
 		pixel_df={}
 		nside_key=f'n{np.log2(ns):.0f}'
+		if intrinsic:
+			bsel=f'{bsel[:4]}_nodust'
+			b1=f'{b1[:4]}_nodust'
+			b2=f'{b2[:4]}_nodust'
+		else:
+			bsel=f'{bsel[:4]}_{nside_key}'
+			b1=f'{b1[:4]}_{nside_key}'
+			b2=f'{b2[:4]}_{nside_key}'
 		for z in zr:
 			z_key=f'z{np.sum(z)/2:.2f}'.replace('.','')
 			####################
@@ -200,10 +200,6 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic):
 				mag=stats.binned_statistic(data_sel[nside_key],data_sel[b1],statistic='median',bins=histogram_bins)[0]
 				col=stats.binned_statistic(data_sel[nside_key],data_sel[b1]-data_sel[b2],statistic='median',bins=histogram_bins)[0]
 				ebv=stats.binned_statistic(data_sel[nside_key],data_sel[f'{nside_key}_SFDmap'],statistic='median',bins=histogram_bins)[0]
-				#if intrinsic:
-				#	print(np.std(data_sel[b1]-data_sel[b1.replace('_nodust','')]))
-				#else:
-				#	print(np.std(data_sel[f'{b1}_nodust']-data_sel[b1]))
 				pixel_df[f'{nside_key}_pixID']=bin_id
 				pixel_df[f'{nside_key}_EBV']=ebv
 				pixel_df[f'{nside_key}_{z_key}_count']=counts
@@ -219,7 +215,7 @@ def pix_stat(fname,nside,bsel,b1,b2,mcut,b1cut,b2cut,zr,bcheck,intrinsic):
 					outstr=f'File {pname.split("/")[-1]} failed'
 					for k in pixel_df.keys():
 						outstr=f'{outstr}\n    Column {k} has {len(pixel_df[k])} elements'
-					pixel_name.append()
+					pixel_name.append(outstr)
 					
 			else:
 				pixel_name.append(None)
