@@ -91,10 +91,10 @@ def magz_err_perfile(fname,nside):
 	sigma_band=np.array([6.0399,2.0000,1.6635,3.168,6.6226])*1e-12
 	sigma={bands[i]:sigma_band[i] for i in range(5)}
 	file_bands=[k for k in data.columns.values if '_ap_' in k]
-	for k in file_bands:
-		temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma[k[:4]],size=len(data)))
-		data.loc[~np.isnan(temp_mag),k]=temp_mag.loc[~np.isnan(temp_mag)]
-		data.loc[np.isnan(temp_mag),k]=99
+	#for k in file_bands:
+	#	temp_mag=-2.5*np.log10(10**(-data[k]/2.5)+np.random.normal(loc=0,scale=sigma[k[:4]],size=len(data)))
+	#	data.loc[~np.isnan(temp_mag),k]=temp_mag.loc[~np.isnan(temp_mag)]
+	#	data.loc[np.isnan(temp_mag),k]=99
 	
 	####################
 	# z errors
@@ -106,13 +106,13 @@ def magz_err_perfile(fname,nside):
 		zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data[f'i_ap_n{n:.0f}']-25.3))),size=len(data))
 		zerr_i_sel=data[f'i_ap_n{n:.0f}']>25.3
 		zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
-		data[f'zobs_n{n:.0f}']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
+		data[f'zobs_n{n:.0f}']=data['zobs_sim']*1.0#+(1+data['zobs_sim'])*zerr_sigma
 	
 	zerr_sigma_low=np.random.normal(loc=0,scale=0.02,size=len(data))
 	zerr_sigma_high=np.random.normal(loc=0,scale=np.abs(0.02*(1+0.5*(data['i_ap_nodust']-25.3))),size=len(data))
 	zerr_i_sel=data['i_ap_nodust']>25.3
 	zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
-	data['zobs_nodust']=data['zobs_sim']+(1+data['zobs_sim'])*zerr_sigma
+	data['zobs_nodust']=data['zobs_sim']*1.0#+(1+data['zobs_sim'])*zerr_sigma
 	
 	data.to_csv(fname)
 
