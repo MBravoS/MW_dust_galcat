@@ -78,8 +78,8 @@ def main():
 	####################
 	# Add errors
 	####################
-	if not data_exist:
-		main_func.magz_err(fnames,opts.nside,multithread=opts.multithread)
+	#if not data_exist:
+	#	main_func.magz_err(fnames,opts.nside,multithread=opts.multithread)
 	
 	####################
 	# Dust vector
