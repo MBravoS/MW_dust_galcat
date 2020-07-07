@@ -17,9 +17,9 @@ def csv_load(f,m1,m2,m3):
 	df=df.loc[(df['r_ap_nodust']<m1)&(df['u_ap_nodust']<m2)&(df['z_ap_nodust']<m3)]
 	return(df)
 
-GAL248_files=glob.glob('/fast_scratch2/mbravo/MWdust_data/galaxies*GALFORM/csv')
-Buz248_files=glob.glob('/fast_scratch2/mbravo/MWdust_data/galaxies*Buzzard/csv')
-Buz260_files=glob.glob('/fast_scratch2/mbravo/MWdust_data_deep/galaxies*Buzzard/csv')
+GAL248_files=glob.glob('/fast_scratch2/mbravo/MWdust_data/galaxies*GALFORM*csv')
+Buz248_files=glob.glob('/fast_scratch2/mbravo/MWdust_data/galaxies*Buzzard*csv')
+Buz260_files=glob.glob('/fast_scratch2/mbravo/MWdust_data_deep/galaxies*Buzzard*csv')
 
 pool=mp.Pool(processes=min(56,len(GAL248_files)))
 temp=[pool.apply_async(csv_load,(f,24.8,27.3,27.2,)) for f in GAL248_files]
