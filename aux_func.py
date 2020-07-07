@@ -114,7 +114,7 @@ def magz_err_perfile(fname,nside):
 	zerr_sigma=np.where(zerr_i_sel,zerr_sigma_high,zerr_sigma_low)
 	data['zobs_nodust']=data['zobs_sim']*1.0#+(1+data['zobs_sim'])*zerr_sigma
 	
-	data.to_csv(fname)
+	data.to_csv(fname,index=False)
 
 ########################################
 # Assign pixel IDs to galaxies
