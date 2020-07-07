@@ -8,7 +8,7 @@ import matplotlib.pyplot as plot
 import matplotlib.gridspec as gs
 
 sp.use_style('/home/mbravo/pypati.style')
-
+new_fig_size=np.array(plot.rcParams.get('figure.figsize')) 
 ########################################
 # Loading data
 ########################################
@@ -20,7 +20,6 @@ def csv_load(f,m1,m2,m3):
 GAL248_files=glob.glob('/fast_scratch2/mbravo/MWdust_data/galaxies*GALFORM*csv')
 Buz248_files=glob.glob('/fast_scratch2/mbravo/MWdust_data/galaxies*Buzzard*csv')
 Buz260_files=glob.glob('/fast_scratch2/mbravo/MWdust_data_deep/galaxies*Buzzard*csv')
-print(len(GAL248_files),len(Buz248_files),len(Buz260_files))
 
 pool=mp.Pool(processes=min(56,len(GAL248_files)))
 temp=[pool.apply_async(csv_load,(f,24.8,27.3,27.2,)) for f in GAL248_files]
@@ -36,7 +35,7 @@ temp=[t.get() for t in temp]
 Buz260_data=pd.concat(temp)
 
 zrange=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]]
-new_fig_size=np.array(plot.rcParams.get('figure.figsize'))
+
 ########################################
 # Plots
 ########################################
@@ -70,4 +69,65 @@ for zr in zrange:
 	j+=1
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.png')
+plot.close()
+
+####################
+# col-mag (ab)
+####################
+fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
+spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.17,right=0.98,bottom=0.08,top=0.97)
+fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
+temp=fax[0].get_xaxis().set_ticklabels([])
+temp=fax[1].get_xaxis().set_ticklabels([])
+for i in range(3):
+	#temp=fax[i].get_xaxis().set_ticks([0,5e3,10e3,15e3,20e3,25e3])
+	#temp=fax[i].get_yaxis().set_ticks([0,15e-5,30e-5,45e-5,60e-5,75e-5,90e-5])
+	#temp=fax[i].get_yaxis().set_ticklabels(['0','$1.5\\textsc{e}^{-3}$','$3.0\\textsc{e}^{-3}$','$4.5\\textsc{e}^{-3}$',
+	# 											'$6.0\\textsc{e}^{-3}$','$7.5\\textsc{e}^{-3}$','$9.0\\textsc{e}^{-3}$'])
+	fax[i].set_rasterized(True) 
+j=0
+for zr in zrange:
+	if j%2==0:
+		temp=gal.loc[(gal['zobs_sim']>zr[0])&(gal['zobs_sim']<zr[1])]
+		sp.contourp(temp['u_ab'],temp['u_ab']-temp['z_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
+					ax=fax[0],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
+					ylabel='${u-z}_\mathrm{ab}$ [mag]')
+		temp=buz.loc[(buz['zobs_sim']>zr[0])&(buz['zobs_sim']<zr[1])]
+		sp.contourp(temp['u_ab'],temp['u_ab']-temp['z_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
+					ax=fax[1],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
+					ylabel='${u-z}_\mathrm{ab}$ [mag]')
+		temp=deep_buz.loc[(deep_buz['zobs_sim']>zr[0])&(deep_buz['zobs_sim']<zr[1])]
+		sp.contourp(temp['u_ab'],temp['u_ab']-temp['z_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
+					ax=fax[2],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
+					xlabel='$u_\mathrm{ab}$ [mag]',ylabel='${u-z}_\mathrm{ab}$ [mag]')
+	j+=1
+plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.pdf')
+plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.png')
+plot.close()
+
+####################
+# col-col
+####################
+fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
+spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.17,right=0.98,bottom=0.08,top=0.97)
+fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
+temp=fax[0].get_xaxis().set_ticklabels([])
+temp=fax[1].get_xaxis().set_ticklabels([])
+for i in range(3):
+	#temp=fax[i].get_xaxis().set_ticks([0,5e3,10e3,15e3,20e3,25e3])
+	#temp=fax[i].get_yaxis().set_ticks([0,15e-5,30e-5,45e-5,60e-5,75e-5,90e-5])
+	#temp=fax[i].get_yaxis().set_ticklabels(['0','$1.5\\textsc{e}^{-3}$','$3.0\\textsc{e}^{-3}$','$4.5\\textsc{e}^{-3}$',
+	#											'$6.0\\textsc{e}^{-3}$','$7.5\\textsc{e}^{-3}$','$9.0\\textsc{e}^{-3}$'])
+	fax[i].set_rasterized(True)
+temp=buz.loc[(buz['zobs_sim']>zrange[0][0])&(buz['zobs_sim']<zrange[0][1])]
+sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,31),np.linspace(-1,3,31)],
+			ax=fax[0],cmap=cmo.cm.gray_r,clog=False,ylabel='${u-r}_\mathrm{ab}$ [mag]')
+temp=buz.loc[(buz['zobs_sim']>zrange[2][0])&(buz['zobs_sim']<zrange[2][1])]
+sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,31),np.linspace(-1,3,31)],
+			ax=fax[1],cmap=cmo.cm.gray_r,ylabel='${u-r}_\mathrm{ab}$ [mag]')
+temp=buz.loc[(buz['zobs_sim']>zrange[4][0])&(buz['zobs_sim']<zrange[4][1])]
+sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,31),np.linspace(-1,3,31)],
+			ax=fax[2],cmap=cmo.cm.gray_r,xlabel='${r-z}_\mathrm{ab}$ [mag]',ylabel='${u-r}_\mathrm{ab}$ [mag]')
+plot.savefig('/fast_scratch2/mbravo/MWdust_plots/col_col.pdf')
+plot.savefig('/fast_scratch2/mbravo/MWdust_plots/col_col.png')
 plot.close()
