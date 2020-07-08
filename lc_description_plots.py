@@ -73,9 +73,9 @@ for zr in zrange:
 		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],ax=fax[2],
 					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
 	j+=1
-fax[0].text(22,6,'$\\textsc{GALFORM}_{r<24.8}$')
-fax[1].text(22,6,'$\\textsc{Buzzard}_{r<24.8}$')
-fax[2].text(22,6,'$\\textsc{Buzzard}_{r<26.0}$')
+fax[0].text(22,6,'\textsc{GALFORM}$_{r<24.8}$')
+fax[1].text(22,6,'\textsc{Buzzard}$_{r<24.8}$')
+fax[2].text(22,6,'\textsc{Buzzard}$_{r<26.0}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.png')
 plot.close()
