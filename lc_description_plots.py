@@ -50,7 +50,7 @@ for i in np.linspace(0,1,5):
 # col-mag (ap)
 ####################
 fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
-spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.06,right=0.97,bottom=0.04,top=0.99)
+spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.08,right=0.97,bottom=0.04,top=0.99)
 fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
 temp=fax[0].get_xaxis().set_ticklabels([])
 temp=fax[1].get_xaxis().set_ticklabels([])
@@ -64,18 +64,18 @@ j=0
 for zr in zrange:
 	if j%2==0:
 		temp=GAL248_data.loc[(GAL248_data['zobs_sim']>zr[0])&(GAL248_data['zobs_sim']<zr[1])]
-		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,31)],ax=fax[0],
+		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],ax=fax[0],
 					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
 		temp=Buz248_data.loc[(Buz248_data['zobs_sim']>zr[0])&(Buz248_data['zobs_sim']<zr[1])]
-		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,31)],ax=fax[1],
+		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],ax=fax[1],
 					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
 		temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zr[0])&(Buz260_data['zobs_sim']<zr[1])]
-		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,31)],ax=fax[2],
+		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],ax=fax[2],
 					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
 	j+=1
-fax[0].text(22,6,'\\textsc{GALFORM}$_r<24.8$')
-fax[1].text(22,6,'\\textsc{Buzzard}$_r<24.8$')
-fax[2].text(22,6,'\\textsc{Buzzard}$_r<26.0$')
+fax[0].text(22,6,'$\\textsc{GALFORM}_{r<24.8}$')
+fax[1].text(22,6,'$\\textsc{Buzzard}_{r<24.8}$')
+fax[2].text(22,6,'$\\textsc{Buzzard}_{r<26.0}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.png')
 plot.close()
@@ -84,7 +84,7 @@ plot.close()
 # col-mag (ab)
 ####################
 fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
-spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.06,right=0.97,bottom=0.04,top=0.99)
+spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.08,right=0.97,bottom=0.04,top=0.99)
 fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
 temp=fax[0].get_xaxis().set_ticklabels([])
 temp=fax[1].get_xaxis().set_ticklabels([])
@@ -98,21 +98,21 @@ j=0
 for zr in zrange:
 	if j%2==0:
 		temp=GAL248_data.loc[(GAL248_data['zobs_sim']>zr[0])&(GAL248_data['zobs_sim']<zr[1])]
-		sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
+		sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-24,-12,61),np.linspace(-0.5,1.5,61)],
 					ax=fax[0],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					ylabel='${g-r}_\mathrm{ab}$ [mag]')
 		temp=Buz248_data.loc[(Buz248_data['zobs_sim']>zr[0])&(Buz248_data['zobs_sim']<zr[1])]
-		sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
+		sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-24,-12,61),np.linspace(-0.5,1.5,61)],
 					ax=fax[1],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					ylabel='${g-r}_\mathrm{ab}$ [mag]')
 		temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zr[0])&(Buz260_data['zobs_sim']<zr[1])]
-		sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
+		sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-24,-12,61),np.linspace(-0.5,1.5,61)],
 					ax=fax[2],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					xlabel='$r_\mathrm{ab}$ [mag]',ylabel='${g-r}_\mathrm{ab}$ [mag]')
 	j+=1
-fax[0].text(-12,-0.5,'\\textsc{GALFORM}$_r<24.8$')
-fax[1].text(-12,-0.5,'\\textsc{Buzzard}$_r<24.8$')
-fax[2].text(-12,-0.5,'\\textsc{Buzzard}$_r<26.0$')
+fax[0].text(-12.5,-0.6,'$\\textsc{GALFORM}_{r<24.8}$')
+fax[1].text(-12.5,-0.6,'$\\textsc{Buzzard}_{r<24.8}$')
+fax[2].text(-12.5,-0.6,'$\\textsc{Buzzard}_{r<26.0}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.png')
 plot.close()
@@ -132,13 +132,13 @@ for i in range(3):
 	#											'$6.0\\textsc{e}^{-3}$','$7.5\\textsc{e}^{-3}$','$9.0\\textsc{e}^{-3}$'])
 	fax[i].set_rasterized(True)
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[0][0])&(Buz260_data['zobs_sim']<zrange[0][1])]
-sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,31),np.linspace(-1,3.5,31)],
+sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
 			ax=fax[0],cmap=cmo.cm.gray_r,clog=False,ylabel='${u-r}_\mathrm{ab}$ [mag]')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[2][0])&(Buz260_data['zobs_sim']<zrange[2][1])]
-sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,31),np.linspace(-1,3.5,31)],
+sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
 			ax=fax[1],cmap=cmo.cm.gray_r,ylabel='${u-r}_\mathrm{ab}$ [mag]')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[4][0])&(Buz260_data['zobs_sim']<zrange[4][1])]
-sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,31),np.linspace(-1,3.5,31)],
+sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
 			ax=fax[2],cmap=cmo.cm.gray_r,xlabel='${r-z}_\mathrm{ab}$ [mag]',ylabel='${u-r}_\mathrm{ab}$ [mag]')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/col_col.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/col_col.png')
