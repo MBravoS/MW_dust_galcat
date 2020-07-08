@@ -40,7 +40,7 @@ zrange=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]]
 # Plots
 ########################################
 colour_list=[]
- for i in np.linspace(0,1,5):
+for i in np.linspace(0,1,5):
 	temp_col=[np.array(cmo.cm.haline(i)) for j in range(2)]
 	temp_col[0][-1]=0.4
 	temp_col[1][-1]=0.8
