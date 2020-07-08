@@ -57,13 +57,13 @@ for i in range(3):
 j=0 
 for zr in zrange:
 	if j%2==0:
-		temp=GAL248.loc[(GAL248['zobs_sim']>zr[0])&(GAL248['zobs_sim']<zr[1])]
+		temp=GAL248_data.loc[(GAL248_data['zobs_sim']>zr[0])&(GAL248_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,31)],ax=fax[0],
 					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
-		temp=Buz248.loc[(Buz248['zobs_sim']>zr[0])&(Buz248['zobs_sim']<zr[1])]
+		temp=Buz248_data.loc[(Buz248_data['zobs_sim']>zr[0])&(Buz248_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,31)],ax=fax[1],
 					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
-		temp=Buz260.loc[(Buz260['zobs_sim']>zr[0])&(Buz260['zobs_sim']<zr[1])]
+		temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zr[0])&(Buz260_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,31)],ax=fax[2],
 					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
 	j+=1
@@ -88,15 +88,15 @@ for i in range(3):
 j=0
 for zr in zrange:
 	if j%2==0:
-		temp=gal.loc[(gal['zobs_sim']>zr[0])&(gal['zobs_sim']<zr[1])]
+		temp=GAL248_data.loc[(GAL248_data['zobs_sim']>zr[0])&(GAL248_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['u_ab'],temp['u_ab']-temp['z_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
 					ax=fax[0],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					ylabel='${u-z}_\mathrm{ab}$ [mag]')
-		temp=buz.loc[(buz['zobs_sim']>zr[0])&(buz['zobs_sim']<zr[1])]
+		temp=Buz248_data.loc[(Buz248_data['zobs_sim']>zr[0])&(Buz248_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['u_ab'],temp['u_ab']-temp['z_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
 					ax=fax[1],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					ylabel='${u-z}_\mathrm{ab}$ [mag]')
-		temp=deep_buz.loc[(deep_buz['zobs_sim']>zr[0])&(deep_buz['zobs_sim']<zr[1])]
+		temp=deep_Buz260_data.loc[(deep_Buz260_data['zobs_sim']>zr[0])&(deep_Buz260_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['u_ab'],temp['u_ab']-temp['z_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
 					ax=fax[2],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					xlabel='$u_\mathrm{ab}$ [mag]',ylabel='${u-z}_\mathrm{ab}$ [mag]')
@@ -119,13 +119,13 @@ for i in range(3):
 	#temp=fax[i].get_yaxis().set_ticklabels(['0','$1.5\\textsc{e}^{-3}$','$3.0\\textsc{e}^{-3}$','$4.5\\textsc{e}^{-3}$',
 	#											'$6.0\\textsc{e}^{-3}$','$7.5\\textsc{e}^{-3}$','$9.0\\textsc{e}^{-3}$'])
 	fax[i].set_rasterized(True)
-temp=buz.loc[(buz['zobs_sim']>zrange[0][0])&(buz['zobs_sim']<zrange[0][1])]
+temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[0][0])&(Buz260_data['zobs_sim']<zrange[0][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,31),np.linspace(-1,3,31)],
 			ax=fax[0],cmap=cmo.cm.gray_r,clog=False,ylabel='${u-r}_\mathrm{ab}$ [mag]')
-temp=buz.loc[(buz['zobs_sim']>zrange[2][0])&(buz['zobs_sim']<zrange[2][1])]
+temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[2][0])&(Buz260_data['zobs_sim']<zrange[2][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,31),np.linspace(-1,3,31)],
 			ax=fax[1],cmap=cmo.cm.gray_r,ylabel='${u-r}_\mathrm{ab}$ [mag]')
-temp=buz.loc[(buz['zobs_sim']>zrange[4][0])&(buz['zobs_sim']<zrange[4][1])]
+temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[4][0])&(Buz260_data['zobs_sim']<zrange[4][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,31),np.linspace(-1,3,31)],
 			ax=fax[2],cmap=cmo.cm.gray_r,xlabel='${r-z}_\mathrm{ab}$ [mag]',ylabel='${u-r}_\mathrm{ab}$ [mag]')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/col_col.pdf')
