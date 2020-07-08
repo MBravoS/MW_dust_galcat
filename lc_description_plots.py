@@ -102,7 +102,7 @@ for zr in zrange:
 		sp.contourp(temp['u_ab'],temp['u_ab']-temp['z_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
 					ax=fax[1],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					ylabel='${u-z}_\mathrm{ab}$ [mag]')
-		temp=deep_Buz260_data.loc[(deep_Buz260_data['zobs_sim']>zr[0])&(deep_Buz260_data['zobs_sim']<zr[1])]
+		temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zr[0])&(Buz260_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['u_ab'],temp['u_ab']-temp['z_ab'],bins=[np.linspace(-22.5,-10.5,31),np.linspace(-1,4,31)],
 					ax=fax[2],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					xlabel='$u_\mathrm{ab}$ [mag]',ylabel='${u-z}_\mathrm{ab}$ [mag]')
