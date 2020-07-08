@@ -64,18 +64,18 @@ j=0
 for zr in zrange:
 	if j%2==0:
 		temp=GAL248_data.loc[(GAL248_data['zobs_sim']>zr[0])&(GAL248_data['zobs_sim']<zr[1])]
-		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],ax=fax[0],
-					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
+		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],
+					ax=fax[0],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,ylabel='$u-z$ [mag]')
 		temp=Buz248_data.loc[(Buz248_data['zobs_sim']>zr[0])&(Buz248_data['zobs_sim']<zr[1])]
-		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],ax=fax[1],
-					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
+		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],
+					ax=fax[1],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,ylabel='$u-z$ [mag]')
 		temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zr[0])&(Buz260_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],ax=fax[2],
 					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
 	j+=1
-fax[0].text(22,6,'\textsc{GALFORM}$_{r<24.8}$')
-fax[1].text(22,6,'\textsc{Buzzard}$_{r<24.8}$')
-fax[2].text(22,6,'\textsc{Buzzard}$_{r<26.0}$')
+fax[0].text(22,6,'\\textsc{GALFORM}$_{r<24.8}$')
+fax[1].text(22,6,'\\textsc{Buzzard}$_{r<24.8}$')
+fax[2].text(22,6,'\\textsc{Buzzard}$_{r<26.0}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.png')
 plot.close()
@@ -110,9 +110,9 @@ for zr in zrange:
 					ax=fax[2],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					xlabel='$r_\mathrm{ab}$ [mag]',ylabel='${g-r}_\mathrm{ab}$ [mag]')
 	j+=1
-fax[0].text(-12.5,-0.6,'$\\textsc{GALFORM}_{r<24.8}$')
-fax[1].text(-12.5,-0.6,'$\\textsc{Buzzard}_{r<24.8}$')
-fax[2].text(-12.5,-0.6,'$\\textsc{Buzzard}_{r<26.0}$')
+fax[0].text(-12.5,-0.6,'\\textsc{GALFORM}$_{r<24.8}$')
+fax[1].text(-12.5,-0.6,'\\textsc{Buzzard}$_{r<24.8}$')
+fax[2].text(-12.5,-0.6,'\\textsc{Buzzard}$_{r<26.0}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.png')
 plot.close()
