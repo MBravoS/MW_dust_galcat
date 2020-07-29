@@ -17,6 +17,7 @@ def csv_load(f,m1,m2,m3):
 	df=df.loc[(df['r_ap_nodust']<m1)&(df['u_ap_nodust']<m2)&(df['z_ap_nodust']<m3)]
 	return(df)
 
+print('Reading data in')
 GAL248_files=glob.glob('/fast_scratch2/mbravo/MWdust_data/galaxies*GALFORM*csv')
 Buz248_files=glob.glob('/fast_scratch2/mbravo/MWdust_data/galaxies*Buzzard*csv')
 Buz260_files=glob.glob('/fast_scratch2/mbravo/MWdust_data_deep/galaxies*Buzzard*csv')
@@ -35,6 +36,7 @@ temp=[t.get() for t in temp]
 Buz260_data=pd.concat(temp)
 
 zrange=[[0.0,0.3],[0.3,0.6],[0.6,0.9],[0.9,1.2],[1.2,2.5]]
+print('Data reading complete')
 
 ########################################
 # Plots
@@ -49,6 +51,7 @@ for i in np.linspace(0,1,5):
 ####################
 # col-mag (ap)
 ####################
+print('Making colour-mag (ap) plot')
 fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
 spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.1,right=0.98,bottom=0.06,top=0.99)
 fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
@@ -87,6 +90,7 @@ plot.close()
 ####################
 # col-mag (ab)
 ####################
+print('Making colour-mag (ab) plot')
 fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
 spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.14,right=0.98,bottom=0.06,top=0.99)
 fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
@@ -128,6 +132,7 @@ plot.close()
 ####################
 # col-col
 ####################
+print('Making colour-colour plot')
 fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
 spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.12,right=0.97,bottom=0.06,top=0.98)
 fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
