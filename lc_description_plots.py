@@ -57,15 +57,13 @@ for i in np.linspace(0,1,5):
 ####################
 print('Making colour-mag (ap) plot')
 fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
-spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.1,right=0.98,bottom=0.06,top=0.99)
+spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.1,right=0.98,bottom=0.05,top=0.99)
 fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
 temp=fax[0].get_xaxis().set_ticklabels([])
 temp=fax[1].get_xaxis().set_ticklabels([])
 for i in range(3):
-	#temp=fax[i].get_xaxis().set_ticks([0,5e3,10e3,15e3,20e3,25e3])
+	temp=fax[i].get_xaxis().set_ticks([20,21.5,23,24.5,26,27.5])
 	#temp=fax[i].get_yaxis().set_ticks([0,15e-5,30e-5,45e-5,60e-5,75e-5,90e-5])
-	#temp=fax[i].get_yaxis().set_ticklabels(['0','$1.5\\textsc{e}^{-3}$','$3.0\\textsc{e}^{-3}$','$4.5\\textsc{e}^{-3}$',
-	#											'$6.0\\textsc{e}^{-3}$','$7.5\\textsc{e}^{-3}$','$9.0\\textsc{e}^{-3}$'])
 	fax[i].set_rasterized(True)
 j=0
 for zr in zrange:
@@ -85,9 +83,9 @@ L=len(zrange)
 fax[0].legend([patches.Patch(color=col_map(0.0/(L-0.8)),alpha=0.8),patches.Patch(color=col_map(2.0/(L-0.8)),alpha=0.8),
 				patches.Patch(color=col_map(4.0/(L-0.8)),alpha=0.8)],
 				['$z_{0.0,0.3}$','$z_{0.6,0.9}$','$z_{1.2,2.5}$'],fontsize=17,loc=2)
-fax[0].text(21.8,6.2,'\\textsc{GALFORM}$_{r<24.8}$')
-fax[1].text(21.8,6.2,'\\textsc{Buzzard}$_{r<24.8}$')
-fax[2].text(21.8,6.2,'\\textsc{Buzzard}$_{r<26.0}$')
+fax[0].text(21.8,6.2,'G$_{24.8}$')
+fax[1].text(21.8,6.2,'B$_{24.8}$')
+fax[2].text(21.8,6.2,'B$_{26.0}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.png')
 plot.close()
@@ -97,15 +95,13 @@ plot.close()
 ####################
 print('Making colour-mag (ab) plot')
 fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
-spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.14,right=0.98,bottom=0.06,top=0.99)
+spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.15,right=0.98,bottom=0.05,top=0.99)
 fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
 temp=fax[0].get_xaxis().set_ticklabels([])
 temp=fax[1].get_xaxis().set_ticklabels([])
 for i in range(3):
 	#temp=fax[i].get_xaxis().set_ticks([0,5e3,10e3,15e3,20e3,25e3])
 	#temp=fax[i].get_yaxis().set_ticks([0,15e-5,30e-5,45e-5,60e-5,75e-5,90e-5])
-	#temp=fax[i].get_yaxis().set_ticklabels(['0','$1.5\\textsc{e}^{-3}$','$3.0\\textsc{e}^{-3}$','$4.5\\textsc{e}^{-3}$',
-	# 											'$6.0\\textsc{e}^{-3}$','$7.5\\textsc{e}^{-3}$','$9.0\\textsc{e}^{-3}$'])
 	fax[i].set_rasterized(True) 
 j=0
 for zr in zrange:
@@ -127,9 +123,9 @@ for zr in zrange:
 fax[0].legend([patches.Patch(color=col_map(0.0/(L-0.8)),alpha=0.8),patches.Patch(color=col_map(2.0/(L-0.8)),alpha=0.8),
 				patches.Patch(color=col_map(4.0/(L-0.8)),alpha=0.8)],
 				['$z_{0.0,0.3}$','$z_{0.6,0.9}$','$z_{1.2,2.5}$'],fontsize=17,loc=2)
-fax[0].text(-12.5,-0.15,'\\textsc{GALFORM}$_{r<24.8}$')
-fax[1].text(-12.5,-0.15,'\\textsc{Buzzard}$_{r<24.8}$')
-fax[2].text(-12.5,-0.15,'\\textsc{Buzzard}$_{r<26.0}$')
+fax[0].text(-12.5,-0.3,'G$_{24.8}$')
+fax[1].text(-12.5,-0.3,'B$_{24.8}$')
+fax[2].text(-12.5,-0.3,'B$_{26.0}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.png')
 plot.close()
@@ -151,7 +147,7 @@ for i in range(3):
 	fax[i].set_rasterized(True)
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[0][0])&(Buz260_data['zobs_sim']<zrange[0][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
-			ax=fax[0],cmap=cmo.cm.speed,clog=False,ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
+			ax=fax[0],cmap=cmo.cm.speed,ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[2][0])&(Buz260_data['zobs_sim']<zrange[2][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
 			ax=fax[1],cmap=cmo.cm.speed,ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
