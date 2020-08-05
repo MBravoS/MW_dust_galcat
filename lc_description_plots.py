@@ -67,7 +67,7 @@ for i in range(3):
 	#temp=fax[i].get_yaxis().set_ticklabels(['0','$1.5\\textsc{e}^{-3}$','$3.0\\textsc{e}^{-3}$','$4.5\\textsc{e}^{-3}$',
 	#											'$6.0\\textsc{e}^{-3}$','$7.5\\textsc{e}^{-3}$','$9.0\\textsc{e}^{-3}$'])
 	fax[i].set_rasterized(True)
-j=0 
+j=0
 for zr in zrange:
 	if j%2==0:
 		temp=GAL248_data.loc[(GAL248_data['zobs_sim']>zr[0])&(GAL248_data['zobs_sim']<zr[1])]
@@ -81,6 +81,7 @@ for zr in zrange:
 					xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,xlabel='$u$ [mag]',ylabel='$u-z$ [mag]')
 	j+=1
 #Legend
+L=len(zrange)
 fax[0].legend([patches.Patch(color=col_map(0.0/(L-0.8)),alpha=0.8),patches.Patch(color=col_map(2.0/(L-0.8)),alpha=0.8),
 				patches.Patch(color=col_map(4.0/(L-0.8)),alpha=0.8)],
 				['$z_{0.0,0.3}$','$z_{0.6,0.9}$','$z_{1.2,2.5}$'],fontsize=17,loc=2)
