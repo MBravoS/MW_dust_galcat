@@ -4,8 +4,10 @@ import pandas as pd
 import splotch as sp
 import cmocean as cmo
 import multiprocessing as mp
+import matplotlib.lies as lines
 import matplotlib.pyplot as plot
 import matplotlib.gridspec as gs
+import matplotlib.patches as patches
 
 sp.use_style('/home/mbravo/pypati.style')
 new_fig_size=np.array(plot.rcParams.get('figure.figsize')) 
