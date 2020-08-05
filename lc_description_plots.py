@@ -4,7 +4,7 @@ import pandas as pd
 import splotch as sp
 import cmocean as cmo
 import multiprocessing as mp
-import matplotlib.lnies as lines
+import matplotlib.lines as lines
 import matplotlib.pyplot as plot
 import matplotlib.gridspec as gs
 import matplotlib.patches as patches
