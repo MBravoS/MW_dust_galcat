@@ -111,6 +111,7 @@ for zr in zrange:
 					xlabel='$r_\mathrm{ab}$ [mag]',ylabel='${g-r}_\mathrm{ab}$ [mag]')
 	j+=1
 #Legend
+L=len(zrange)
 fax[0].legend([patches.Patch(color=col_map(0.0/(L-0.8)),alpha=0.8),patches.Patch(color=col_map(2.0/(L-0.8)),alpha=0.8),
 				patches.Patch(color=col_map(4.0/(L-0.8)),alpha=0.8)],
 				['$z_{0.0,0.3}$','$z_{0.6,0.9}$','$z_{1.2,2.5}$'],fontsize=17,loc=2)
