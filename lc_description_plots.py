@@ -62,20 +62,16 @@ fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[
 temp=fax[0].get_xaxis().set_ticklabels([])
 temp=fax[1].get_xaxis().set_ticklabels([])
 for i in range(3):
-	#temp=fax[i].get_xaxis().set_ticks([0,5e3,10e3,15e3,20e3,25e3])
-	#temp=fax[i].get_yaxis().set_ticks([0,15e-5,30e-5,45e-5,60e-5,75e-5,90e-5])
-	#temp=fax[i].get_yaxis().set_ticklabels(['0','$1.5\\textsc{e}^{-3}$','$3.0\\textsc{e}^{-3}$','$4.5\\textsc{e}^{-3}$',
-	#											'$6.0\\textsc{e}^{-3}$','$7.5\\textsc{e}^{-3}$','$9.0\\textsc{e}^{-3}$'])
 	fax[i].set_rasterized(True)
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[0][0])&(Buz260_data['zobs_sim']<zrange[0][1])]
-sp.hist2D(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],
-			ax=fax[0],cmap=cmo.cm.gray_r,xinvert=True,ylabel='${u-z}_\mathrm{ap}$ [mag]',clabel='PDF')
+sp.hist2D(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,27.3,61),np.linspace(-2,8,61)],
+			ax=fax[0],cmap=cmo.cm.speed,xinvert=True,ylabel='${u-z}_\mathrm{ap}$ [mag]',clabel='PDF')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[2][0])&(Buz260_data['zobs_sim']<zrange[2][1])]
-sp.hist2D(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],
-			ax=fax[1],cmap=cmo.cm.gray_r,xinvert=True,ylabel='${u-z}_\mathrm{ap}$ [mag]',clabel='PDF')
+sp.hist2D(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,27.3,61),np.linspace(-2,8,61)],
+			ax=fax[1],cmap=cmo.cm.speed,xinvert=True,ylabel='${u-z}_\mathrm{ap}$ [mag]',clabel='PDF')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[4][0])&(Buz260_data['zobs_sim']<zrange[4][1])]
-sp.hist2D(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,28,61),np.linspace(-1,7,61)],
-			ax=fax[2],cmap=cmo.cm.gray_r,xinvert=True,xlabel='$u_\mathrm{ap}$ [mag]',
+sp.hist2D(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,27.3,61),np.linspace(-2,8,61)],
+			ax=fax[2],cmap=cmo.cm.speed,xinvert=True,xlabel='$u_\mathrm{ap}$ [mag]',
 			ylabel='${u-z}_\mathrm{ap}$ [mag]',clabel='PDF')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.png')
@@ -91,8 +87,6 @@ fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[
 temp=fax[0].get_xaxis().set_ticklabels([])
 temp=fax[1].get_xaxis().set_ticklabels([])
 for i in range(3):
-	#temp=fax[i].get_xaxis().set_ticks([0,5e3,10e3,15e3,20e3,25e3])
-	#temp=fax[i].get_yaxis().set_ticks([0,15e-5,30e-5,45e-5,60e-5,75e-5,90e-5])
 	fax[i].set_rasterized(True) 
 j=0
 for zr in zrange:
@@ -132,20 +126,16 @@ fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[
 temp=fax[0].get_xaxis().set_ticklabels([])
 temp=fax[1].get_xaxis().set_ticklabels([])
 for i in range(3):
-	#temp=fax[i].get_xaxis().set_ticks([0,5e3,10e3,15e3,20e3,25e3])
-	#temp=fax[i].get_yaxis().set_ticks([0,15e-5,30e-5,45e-5,60e-5,75e-5,90e-5])
-	#temp=fax[i].get_yaxis().set_ticklabels(['0','$1.5\\textsc{e}^{-3}$','$3.0\\textsc{e}^{-3}$','$4.5\\textsc{e}^{-3}$',
-	#											'$6.0\\textsc{e}^{-3}$','$7.5\\textsc{e}^{-3}$','$9.0\\textsc{e}^{-3}$'])
 	fax[i].set_rasterized(True)
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[0][0])&(Buz260_data['zobs_sim']<zrange[0][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
-			ax=fax[0],cmap=cmo.cm.gray_r,ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
+			ax=fax[0],cmap=cmo.cm.speed,ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[2][0])&(Buz260_data['zobs_sim']<zrange[2][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
-			ax=fax[1],cmap=cmo.cm.gray_r,ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
+			ax=fax[1],cmap=cmo.cm.speed,ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[4][0])&(Buz260_data['zobs_sim']<zrange[4][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
-			ax=fax[2],cmap=cmo.cm.gray_r,xlabel='${r-z}_\mathrm{ab}$ [mag]',
+			ax=fax[2],cmap=cmo.cm.speed,xlabel='${r-z}_\mathrm{ab}$ [mag]',
 			ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/col_col.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/col_col.png')
