@@ -87,9 +87,9 @@ def split_dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_l
 		new_mag=np.array(dusted_data[band_1])[mag_sel]
 		new_col=np.array(dusted_data[band_1]-dusted_data[band_2])[mag_sel]
 		
-		n_dust_high.append(np.log10(new_n/base_n))
-		m_dust_high.append(np.median(new_mag)-base_m)
-		c_dust_high.append(np.median(new_col)-base_c)
+		n_dust_low.append(np.log10(new_n/base_n))
+		m_dust_low.append(np.median(new_mag)-base_m)
+		c_dust_low.append(np.median(new_col)-base_c)
 		
 		# high density
 		dusted_data=data.loc[gal_high].copy()
