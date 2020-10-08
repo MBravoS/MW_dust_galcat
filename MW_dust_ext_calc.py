@@ -99,11 +99,6 @@ def main():
 								mag_cut=opts.sel_mag_cut,b1_cut=opts.band1_mag_cut,b2_cut=opts.band2_mag_cut,
 								border_check=opts.border_check,multithread=opts.multithread)
 	
-	####################
-	# Dust map
-	####################
-	#main_func.dust_mapping(pnames,dust_vector,opts.nside,opts.zbins,opts.out_dir,opts.plot_dir)
-	
 	t1=time.time()
 	print(f'Total running time = {t1-t0} s')
 

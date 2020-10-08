@@ -1,121 +1,4 @@
 '''Here are the core functions for the map analysis'''
-########################################
-# Dust map recovery
-########################################
-def dust_mapping(pnames,dvec,nside,zrange,out_dir,plot_dir):
-	import time
-	import aux_func
-	import numpy as np
-	import pandas as pd
-	import splotch as sp
-	import scipy.optimize as opti
-	import matplotlib.lines as lines
-	import matplotlib.pyplot as plot
-	import scipy.interpolate as interp
-	import matplotlib.patches as patches
-	
-	t0=time.time()
-	for i in range(len(nside)):
-		ns=nside[i]
-		nside_key=f'n{np.log2(ns):.0f}'
-		data=pd.concat([pd.read_csv(p) for p in pnames if nside_key in p],ignore_index=True)
-		Debv,ebv_from_delta,ebv_from_mag,ebv_from_col=[],[],[],[]
-		EBV_recovery,z_label=[],[]
-		EBV_input=data[f'{nside_key}_EBV']
-		for j in range(len(zrange)):
-			zr=zrange[j]
-			z_label.append(f'$z_{{{np.sum(zr)/2:.2f}}}$')
-			z_key=f'z{np.sum(zr)/2:.2f}'.replace('.','')
-			
-			####################
-			# Delta calc
-			####################
-			delta=data[f'{nside_key}_{z_key}_count']+np.random.uniform(-0.5,0.5,len(data))
-			data[f'{nside_key}_{z_key}_delta']=np.log10(delta/np.mean(delta))
-			
-			####################
-			# Read dust vector
-			####################
-			dust_vector=pd.read_csv(f'{out_dir}dust_vector_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}.csv')
-			dust_vector,ebv2d,ebv2m,ebv2c=aux_func.slope2(dust_vector,np.array(data[f'{nside_key}_EBV']))
-			
-			plot.figure()
-			sp.plot(dust_vector['deltaEBV'],dust_vector['delta'],plabel='$\log(\delta+1)_\mathrm{measured}$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['mag'],plabel='$u_\mathrm{measured}$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['col'],plabel='$(u-z)_\mathrm{measured}$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2d,linestyle='dotted',plabel='$\delta_\mathrm{fit}$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2m,linestyle='dotted',plabel='$u_\mathrm{fit}$')
-			sp.plot(dust_vector['deltaEBV'],dust_vector['deltaEBV']*ebv2c,linestyle='dotted',plabel='${u-z}_\mathrm{fit}$',
-					xlabel='$\Delta E(B-V)$ [mag]',ylabel='$\Delta$',xlim=[-0.1,0.1])
-			plot.tight_layout()
-			plot.savefig(f'{plot_dir}metric_check_{pnames[0].split("/")[-1].split("_")[2]}_{z_key}.pdf')
-			plot.close()
-			
-			Debv.append(data[f'{nside_key}_EBV']-np.median(data[f'{nside_key}_EBV']))
-			#ebv_from_delta.append(data[f'{nside_key}_{z_key}_delta']/ebv2d)
-			ebv_from_delta.append((data[f'{nside_key}_{z_key}_delta']-np.median(data[f'{nside_key}_{z_key}_delta']))/ebv2d)
-			ebv_from_mag.append((data[f'{nside_key}_{z_key}_mag']-np.median(data[f'{nside_key}_{z_key}_mag']))/ebv2m)
-			ebv_from_col.append((data[f'{nside_key}_{z_key}_col']-np.median(data[f'{nside_key}_{z_key}_col']))/ebv2c)
-			
-			spl_delta=interp.UnivariateSpline(dust_vector['deltaEBV'],dust_vector['delta'],ext=0)
-			spl_mag=interp.UnivariateSpline(dust_vector['deltaEBV'],dust_vector['mag'],ext=0)
-			spl_col=interp.UnivariateSpline(dust_vector['deltaEBV'],dust_vector['col'],ext=0)
-			
-			def dist(val,D,M,C):
-				dd=spl_delta(val)
-				mm=spl_mag(val)
-				cc=spl_col(val)
-				return(((D-dd/ebv2d)**2+(M-mm/ebv2m)**2+(C-cc/ebv2c)**2)**0.5)
-			
-			ebv_recover=np.zeros(len(ebv_from_delta[j]))
-			for k in range(len(ebv_from_delta[j])):
-				ebv_recover[k]=opti.minimize(dist,x0=0.0,args=(ebv_from_delta[j][k],ebv_from_mag[j][k],ebv_from_col[j][k])).x
-			
-			EBV_recovery.append(ebv_recover+np.median(EBV_input))
-		
-		EBV_final=np.array(EBV_recovery)
-		EBV_final=np.average(EBV_final,axis=0,weights=1/np.var(EBV_final,axis=1))
-		
-		####################
-		# Plots
-		####################
-		msize=20
-		if nside[i]>65:
-			msize=1
-		
-		plot.figure()
-		for j in range(len(zrange)):
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_delta[j],c=f'C{j}',marker='d',s=msize)
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_mag[j],c=f'C{j}',marker='*',s=msize)
-			sp.scatter(EBV_input-np.median(EBV_input),ebv_from_col[j],c=f'C{j}',xlabel='$\Delta E(B-V)_\mathrm{input}$',
-						ylabel='$\Delta E(B-V)_\mathrm{recovered}$',xlim=[-0.1,0.2],s=msize)
-		sp.axline(a=1,color='k',linestyle='dashed')
-		plot.legend([patches.Patch(color=f'C{j}') for j in range(len(zrange))]+
-					[lines.Line2D([0.5],[0.5],color='gray',marker='d',linestyle=''),
-						lines.Line2D([0.5],[0.5],color='gray',marker='*',linestyle=''),
-						lines.Line2D([0.5],[0.5],color='gray',marker='o',linestyle=''),
-						lines.Line2D([0,1],[0,1],color='black',linestyle='dashed')],
-					[f'{z_label[j]}' for j in range(len(zrange))]+['$\delta$','$u$','$u-z$','1:1'])
-		plot.tight_layout()
-		plot.savefig(f'{plot_dir}delta_ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_full.pdf')
-		
-		plot.figure()
-		for j in range(len(zrange)):
-			sp.scatter(EBV_input,EBV_recovery[j],plabel=z_label[j],c=f'C{j}',xlabel='$E(B-V)_\mathrm{input}$',
-						ylabel='$E(B-V)_\mathrm{recovered}$',xlim=[0,0.2],ylim=[-0.1,0.3],s=msize)
-		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
-		plot.tight_layout()
-		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_combined.pdf')
-		
-		plot.figure()
-		sp.scatter(EBV_input,EBV_final,c='C0',xlabel='$E(B-V)_\mathrm{input}$',ylabel='$E(B-V)_\mathrm{recovered}$',
-					xlim=[0,0.2],ylim=[0,0.2],s=msize)
-		sp.axline(a=1,plabel='1:1',color='k',linestyle='dashed')
-		plot.tight_layout()
-		plot.savefig(f'{plot_dir}ebv_recovery_zbin_{pnames[0].split("/")[-1].split("_")[2]}_{nside_key}_final.pdf')
-	
-	t1=time.time()
-	print(f'Dust map recovered in {t1-t0} s')
 
 ########################################
 # Dust vector calculation
@@ -180,26 +63,45 @@ def dust_vector(fnames,band_sel,band_1,band_2,data_dir,plot_dir,zrange,mag_cut=2
 	####################
 	# Plots
 	####################
-	EBV=[EBV]*len(zrange)
-	vir=cm.get_cmap('viridis')
-	cr=vir(np.array([i/5.0 for i in range(len(zrange))]))
-	zlabel=[f'$z_{{{z[0]},{z[1]}}}$' for z in zrange]
+	#EBV=[EBV]*len(zrange)
+	#vir=cm.get_cmap('viridis')
+	#cr=vir(np.array([i/5.0 for i in range(len(zrange))]))
+	#zlabel=[f'$z_{{{z[0]},{z[1]}}}$' for z in zrange]
+	#
+	#print('Making E(B-V) vs delta/mag/col plot')
+	#
+	#plot.figure(figsize=[fs[0],fs[1]*3])
+	#
+	#plot.subplot(3,1,1)
+	#sp.plot(EBV,delta,c=cr,ylabel='$\Delta\log(\delta+1)$',title=run_name,plabel=zlabel)
+	#plot.subplot(3,1,2)
+	#sp.plot(EBV,mag,c=cr,ylabel=f'$\Delta {band_1[0]}$ [mag]')
+	#sp.plot(EBV[0],A_b1,c='k',linestyle='dashed',plabel=f'A$({band_1[0]})$ [mag]')
+	#plot.subplot(3,1,3)
+	#sp.plot(EBV,col,c=cr,xlabel='E(B-V) [mag]',ylabel=f'$\Delta({band_1[0]}-{band_2[0]})$ [mag]')
+	#sp.plot(EBV[0],E_b1b2,c='k',linestyle='dashed',plabel=f'E$({band_1[0]}-{band_2[0]})$ [mag]')
+	#plot.tight_layout()
+	#plot.savefig(f'{plot_dir}dust_vector_{run_name}.pdf')
+	#plot.close()
 	
-	print('Making E(B-V) vs delta/mag/col plot')
+	####################
+	# Split delta
+	####################
+	print('Calculating delta-split dust vectors')
+	if multithread:
+		pool=mp.Pool(processes=min(multithread,len(A_sel)))
+		split_vector_comp=[pool.apply(aux_func.split_dust_vector,(d,f'{band_sel}_nodust',f'{band_1}_nodust',
+														f'{band_2}_nodust',EBV,mag_cut,b1_cut,b2_cut,)) for d in data]
+	else:
+		split_vector_comp=[aux_func.split_dust_vector(d,f'{band_sel}_nodust',f'{band_1}_nodust',
+											f'{band_2}_nodust',EBV,mag_cut,b1_cut,b2_cut) for d in data]
 	
-	plot.figure(figsize=[fs[0],fs[1]*3])
-	
-	plot.subplot(3,1,1)
-	sp.plot(EBV,delta,c=cr,ylabel='$\Delta\log(\delta+1)$',title=run_name,plabel=zlabel)
-	plot.subplot(3,1,2)
-	sp.plot(EBV,mag,c=cr,ylabel=f'$\Delta {band_1[0]}$ [mag]')
-	sp.plot(EBV[0],A_b1,c='k',linestyle='dashed',plabel=f'A$({band_1[0]})$ [mag]')
-	plot.subplot(3,1,3)
-	sp.plot(EBV,col,c=cr,xlabel='E(B-V) [mag]',ylabel=f'$\Delta({band_1[0]}-{band_2[0]})$ [mag]')
-	sp.plot(EBV[0],E_b1b2,c='k',linestyle='dashed',plabel=f'E$({band_1[0]}-{band_2[0]})$ [mag]')
-	plot.tight_layout()
-	plot.savefig(f'{plot_dir}dust_vector_{run_name}.pdf')
-	plot.close()
+	for i in range(len(zrange)):
+		zstr=f'{(zrange[i][0]+zrange[i][1])/2:.2f}'.translate({ord(c): None for c in '.'})
+		csv_name=f'{data_dir}dust_vector_split_{run_name}_z{zstr}.csv'
+		split_vector_comp[i]['EBV']=EBV
+		split_vector_comp[i].to_csv(csv_name,index=False)
+	print('Split-delta dust vectors saved')
 	
 	t1=time.time()
 	print(f'Dust vectors created in {t1-t0} s')

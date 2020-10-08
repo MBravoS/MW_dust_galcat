@@ -66,13 +66,16 @@ for i in range(3):
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[0][0])&(Buz260_data['zobs_sim']<zrange[0][1])]
 sp.hist2D(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,27.3,61),np.linspace(-2,8,61)],
 			ax=fax[0],cmap=cmo.cm.speed,xinvert=True,ylabel='${u-z}_\mathrm{ap}$ [mag]',clabel='PDF')
+fax[0].text(7,22.2,'$z_{0.0,0.3}$')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[2][0])&(Buz260_data['zobs_sim']<zrange[2][1])]
 sp.hist2D(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,27.3,61),np.linspace(-2,8,61)],
 			ax=fax[1],cmap=cmo.cm.speed,xinvert=True,ylabel='${u-z}_\mathrm{ap}$ [mag]',clabel='PDF')
+fax[1].text(7,22.2,'$z_{0.6,0.9}$')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[4][0])&(Buz260_data['zobs_sim']<zrange[4][1])]
 sp.hist2D(temp['u_ap_nodust'],temp['u_ap_nodust']-temp['z_ap_nodust'],bins=[np.linspace(19,27.3,61),np.linspace(-2,8,61)],
 			ax=fax[2],cmap=cmo.cm.speed,xinvert=True,xlabel='$u_\mathrm{ap}$ [mag]',
 			ylabel='${u-z}_\mathrm{ap}$ [mag]',clabel='PDF')
+fax[2].text(7,22.2,'$z_{1.2,2.5}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ap.png')
 plot.close()
@@ -130,13 +133,16 @@ for i in range(3):
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[0][0])&(Buz260_data['zobs_sim']<zrange[0][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
 			ax=fax[0],cmap=cmo.cm.speed,ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
+fax[0].text(-0.8,2.2,'$z_{0.0,0.3}$')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[2][0])&(Buz260_data['zobs_sim']<zrange[2][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
 			ax=fax[1],cmap=cmo.cm.speed,ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
+fax[1].text(-0.8,2.2,'$z_{0.6,0.9}$')
 temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zrange[4][0])&(Buz260_data['zobs_sim']<zrange[4][1])]
 sp.hist2D(temp['r_ab']-temp['z_ab'],temp['u_ab']-temp['r_ab'],bins=[np.linspace(-1,1.5,61),np.linspace(-1,3.5,61)],
 			ax=fax[2],cmap=cmo.cm.speed,xlabel='${r-z}_\mathrm{ab}$ [mag]',
 			ylabel='${u-r}_\mathrm{ab}$ [mag]',clabel='PDF')
+fax[2].text(-0.8,2.2,'$z_{1.2,2.5}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/col_col.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/col_col.png')
 plot.close()

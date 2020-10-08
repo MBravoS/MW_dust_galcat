@@ -42,6 +42,78 @@ def dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag
 	
 	return(pd.DataFrame({'delta':n_dust,'mag':m_dust,'col':c_dust}))
 
+def split_dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_lim,mag_2_lim):
+	import numpy as np
+	import pandas as pd
+	
+	data=pd.concat([pd.read_csv(f) for f in fnames])
+	
+	mag_filt_list=[k for k in data.columns.values if 'ap_nodust' in k]
+	mag_sel=data[band_sel]<mag_sel_lim
+	mag_sel&=data[band_1]<mag_1_lim
+	mag_sel&=data[band_2]<mag_2_lim
+	data=data.loc[mag_sel]
+	
+	base_n=1.0*len(data)
+	base_m=np.median(data[band_1])
+	base_c=np.median(data[band_1]-data[band_2])
+	n_dust,m_dust,c_dust=[[],[],[]]
+	
+	gal_pix=data['n6']
+	pix_unique,pix_count=np.unique(gal_pix,return_counts=True)
+	pix_sel=np.where(pix_count<=np.median(pix_count),True,False)
+	pix_low=pix_unique[pix_sel]
+	gal_low=np.zeros(len(pix_list)).astype('bool')
+	for pix in pix_low:
+		gal_low|=pix_list==pix
+	pix_high=pix_unique[~pix_sel]
+	gal_high=np.zeros(len(pix_list)).astype('bool')
+	for pix in pix_high:
+		gal_high|=pix_list==pix
+	
+	for i in range(len(ebv_test)):
+		# low density
+		dusted_data=data.loc[gal_low].copy()
+		for mfl in mag_filt_list:
+			A_mfl,temp=extinction_law(ebv_test[i],mfl.replace('_nodust',''),band_1.replace('_nodust',''))
+			dusted_data[mfl]+=A_mfl
+			
+		mag_sel=(dusted_data[band_sel]<mag_sel_lim)
+		mag_sel&=(dusted_data[band_1]<mag_1_lim)
+		mag_sel&=(dusted_data[band_2]<mag_2_lim)
+		
+		new_n=1.0*np.sum(mag_sel)
+		new_mag=np.array(dusted_data[band_1])[mag_sel]
+		new_col=np.array(dusted_data[band_1]-dusted_data[band_2])[mag_sel]
+		
+		n_dust_high.append(np.log10(new_n/base_n))
+		m_dust_high.append(np.median(new_mag)-base_m)
+		c_dust_high.append(np.median(new_col)-base_c)
+		
+		# high density
+		dusted_data=data.loc[gal_high].copy()
+		for mfl in mag_filt_list:
+			A_mfl,temp=extinction_law(ebv_test[i],mfl.replace('_nodust',''),band_1.replace('_nodust',''))
+			dusted_data[mfl]+=A_mfl
+			
+		mag_sel=(dusted_data[band_sel]<mag_sel_lim)
+		mag_sel&=(dusted_data[band_1]<mag_1_lim)
+		mag_sel&=(dusted_data[band_2]<mag_2_lim)
+		
+		new_n=1.0*np.sum(mag_sel)
+		new_mag=np.array(dusted_data[band_1])[mag_sel]
+		new_col=np.array(dusted_data[band_1]-dusted_data[band_2])[mag_sel]
+		
+		n_dust_high.append(np.log10(new_n/base_n))
+		m_dust_high.append(np.median(new_mag)-base_m)
+		c_dust_high.append(np.median(new_col)-base_c)
+	
+	n_dust_low,m_dust_low,c_dust_low=[np.array(n_dust_low),np.array(m_dust_low),np.array(c_dust_low)]
+	n_dust_high,m_dust_high,c_dust_high=[np.array(n_dust_high),np.array(m_dust_high),np.array(c_dust_high)]
+	
+	return(pd.DataFrame({'delta_low':n_dust_low,'mag_low':m_dust_low,'col_low':c_dust_low,
+							'delta_high':n_dust_high,'mag_high':m_dust_high,'col_high':c_dust_high}))
+
 ########################################
 # Convert E(B-V) to A(b1) and E(b1-b2)
 ########################################
