@@ -63,13 +63,13 @@ def split_dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_l
 	pix_unique,pix_count=np.unique(gal_pix,return_counts=True)
 	pix_sel=np.where(pix_count<=np.median(pix_count),True,False)
 	pix_low=pix_unique[pix_sel]
-	gal_low=np.zeros(len(pix_list)).astype('bool')
+	gal_low=np.zeros(len(gal_pix)).astype('bool')
 	for pix in pix_low:
-		gal_low|=pix_list==pix
+		gal_low|=gal_pix==pix
 	pix_high=pix_unique[~pix_sel]
-	gal_high=np.zeros(len(pix_list)).astype('bool')
+	gal_high=np.zeros(len(gal_pix)).astype('bool')
 	for pix in pix_high:
-		gal_high|=pix_list==pix
+		gal_high|=gal_pix==pix
 	
 	for i in range(len(ebv_test)):
 		# low density
