@@ -57,7 +57,8 @@ def split_dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_l
 	base_n=1.0*len(data)
 	base_m=np.median(data[band_1])
 	base_c=np.median(data[band_1]-data[band_2])
-	n_dust,m_dust,c_dust=[[],[],[]]
+	n_dust_low,m_dust_low,c_dust_low=[[],[],[]]
+	n_dust_high,m_dust_high,c_dust_high=[[],[],[]]
 	
 	gal_pix=data['n6']
 	pix_unique,pix_count=np.unique(gal_pix,return_counts=True)
