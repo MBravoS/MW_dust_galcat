@@ -72,6 +72,13 @@ def split_dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_l
 	for pix in pix_high:
 		gal_high|=gal_pix==pix
 	
+	base_n_low=1.0*np.sum(pix_sel)
+	base_m_low=np.median(data.loc[pix_sel,band_1])
+	base_c_low=np.median(data.loc[pix_sel,band_1]-data.loc[pix_sel,band_2])
+	base_n_high=1.0*np.sum(~pix_sel)
+	base_m_high=np.median(data.loc[~pix_sel,band_1])
+	base_c_high=np.median(data.loc[~pix_sel,band_1]-data.loc[~pix_sel,band_2])
+	
 	for i in range(len(ebv_test)):
 		# low density
 		dusted_data=data.loc[gal_low].copy()
@@ -87,9 +94,9 @@ def split_dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_l
 		new_mag=np.array(dusted_data[band_1])[mag_sel]
 		new_col=np.array(dusted_data[band_1]-dusted_data[band_2])[mag_sel]
 		
-		n_dust_low.append(np.log10(new_n/base_n))
-		m_dust_low.append(np.median(new_mag)-base_m)
-		c_dust_low.append(np.median(new_col)-base_c)
+		n_dust_low.append(np.log10(new_n/base_n_low))
+		m_dust_low.append(np.median(new_mag)-base_m_low)
+		c_dust_low.append(np.median(new_col)-base_c_low)
 		
 		# high density
 		dusted_data=data.loc[gal_high].copy()
@@ -105,9 +112,9 @@ def split_dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_l
 		new_mag=np.array(dusted_data[band_1])[mag_sel]
 		new_col=np.array(dusted_data[band_1]-dusted_data[band_2])[mag_sel]
 		
-		n_dust_high.append(np.log10(new_n/base_n))
-		m_dust_high.append(np.median(new_mag)-base_m)
-		c_dust_high.append(np.median(new_col)-base_c)
+		n_dust_high.append(np.log10(new_n/base_n_high))
+		m_dust_high.append(np.median(new_mag)-base_m_high)
+		c_dust_high.append(np.median(new_col)-base_c_high)
 	
 	n_dust_low,m_dust_low,c_dust_low=[np.array(n_dust_low),np.array(m_dust_low),np.array(c_dust_low)]
 	n_dust_high,m_dust_high,c_dust_high=[np.array(n_dust_high),np.array(m_dust_high),np.array(c_dust_high)]
