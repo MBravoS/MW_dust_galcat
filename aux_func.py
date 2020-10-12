@@ -72,12 +72,12 @@ def split_dust_vector(fnames,band_sel,band_1,band_2,ebv_test,mag_sel_lim,mag_1_l
 	for pix in pix_high:
 		gal_high|=gal_pix==pix
 	
-	base_n_low=1.0*np.sum(pix_sel)
-	base_m_low=np.median(data.loc[pix_sel,band_1])
-	base_c_low=np.median(data.loc[pix_sel,band_1]-data.loc[pix_sel,band_2])
-	base_n_high=1.0*np.sum(~pix_sel)
-	base_m_high=np.median(data.loc[~pix_sel,band_1])
-	base_c_high=np.median(data.loc[~pix_sel,band_1]-data.loc[~pix_sel,band_2])
+	base_n_low=1.0*np.sum(gal_low)
+	base_m_low=np.median(data.loc[gal_low,band_1])
+	base_c_low=np.median(data.loc[gal_low,band_1]-data.loc[gal_low,band_2])
+	base_n_high=1.0*np.sum(gal_high)
+	base_m_high=np.median(data.loc[gal_high,band_1])
+	base_c_high=np.median(data.loc[gal_high,band_1]-data.loc[gal_high,band_2])
 	
 	for i in range(len(ebv_test)):
 		# low density
