@@ -85,11 +85,11 @@ plot.close()
 ####################
 print('Making colour-mag (ab) plot')
 fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
-spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.15,right=0.98,bottom=0.05,top=0.99)
-fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0]),fig.add_subplot(spec[2,0])]
-temp=fax[0].get_xaxis().set_ticklabels([])
-temp=fax[1].get_xaxis().set_ticklabels([])
-for i in range(3):
+spec=gs.GridSpec(nrows=1,ncols=2,figure=fig,wspace=0,hspace=0,left=0.15,right=0.98,bottom=0.05,top=0.99)
+fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[1,0])]#,fig.add_subplot(spec[2,0])]
+temp=fax[0].get_yaxis().set_ticklabels([])
+#temp=fax[1].get_xaxis().set_ticklabels([])
+for i in range(2):
 	fax[i].set_rasterized(True) 
 j=0
 for zr in zrange:
@@ -97,15 +97,15 @@ for zr in zrange:
 		temp=GAL248_data.loc[(GAL248_data['zobs_sim']>zr[0])&(GAL248_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-24,-12,61),np.linspace(-0.5,1.5,61)],
 					ax=fax[0],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
-					ylabel='${g-r}_\mathrm{ab}$ [mag]')
+					xlabel='$r_\mathrm{ab}$ [mag]')
 		temp=Buz248_data.loc[(Buz248_data['zobs_sim']>zr[0])&(Buz248_data['zobs_sim']<zr[1])]
 		sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-24,-12,61),np.linspace(-0.5,1.5,61)],
 					ax=fax[1],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
-					ylabel='${g-r}_\mathrm{ab}$ [mag]')
-		temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zr[0])&(Buz260_data['zobs_sim']<zr[1])]
-		sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-24,-12,61),np.linspace(-0.5,1.5,61)],
-					ax=fax[2],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
 					xlabel='$r_\mathrm{ab}$ [mag]',ylabel='${g-r}_\mathrm{ab}$ [mag]')
+		#temp=Buz260_data.loc[(Buz260_data['zobs_sim']>zr[0])&(Buz260_data['zobs_sim']<zr[1])]
+		#sp.contourp(temp['r_ab'],temp['g_ab']-temp['r_ab'],bins=[np.linspace(-24,-12,61),np.linspace(-0.5,1.5,61)],
+		#			ax=fax[2],xinvert=True,smooth=0.8,filled=True,colors=colour_list[j],plabel=False,
+		#			xlabel='$r_\mathrm{ab}$ [mag]',ylabel='${g-r}_\mathrm{ab}$ [mag]')
 	j+=1
 #Legend
 L=len(zrange)
