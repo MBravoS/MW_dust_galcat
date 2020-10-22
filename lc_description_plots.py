@@ -58,7 +58,7 @@ for i in np.linspace(0,1,5):
 print('Making colour-mag (ap) plot')
 fig=plot.figure(figsize=(new_fig_size[0],new_fig_size[0]*2))
 spec=gs.GridSpec(nrows=3,ncols=1,figure=fig,wspace=0,hspace=0,left=0.12,right=0.97,bottom=0.06,top=0.98)
-fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[0,1]),fig.add_subplot(spec[2,0])]
+fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[0,1]),fig.add_subplot(spec[0,2])]
 temp=fax[0].get_xaxis().set_ticklabels([])
 temp=fax[1].get_xaxis().set_ticklabels([])
 for i in range(3):
