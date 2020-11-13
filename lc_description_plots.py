@@ -48,9 +48,9 @@ print('Data reading complete')
 colour_list=[]
 for i in np.linspace(0,1,5):
 	temp_col=[np.array(cmo.cm.haline(i)) for j in range(3)]
-	temp_col[0][-1]=0.2
-	temp_col[1][-1]=0.5
-	temp_col[2][-1]=0.8
+	temp_col[0][-1]=0.4
+	temp_col[1][-1]=0.7
+	temp_col[2][-1]=1.0
 	colour_list.append(temp_col)
 
 ####################
@@ -113,8 +113,8 @@ L=len(zrange)
 fax[0].legend([patches.Patch(color=col_map(0.0/(L-0.8)),alpha=0.8),patches.Patch(color=col_map(2.0/(L-0.8)),alpha=0.8),
 				patches.Patch(color=col_map(4.0/(L-0.8)),alpha=0.8)],
 				['$z_{0.0,0.3}$','$z_{0.6,0.9}$','$z_{1.2,2.5}$'],fontsize=17,loc=2)
-fax[0].text(-12.5,-0.35,'GALFORM',backgroundcolor='white')
-fax[1].text(-12.5,-0.35,'\\textsc{Buzzard}',backgroundcolor='white')
+fax[0].text(-12.5,-0.37,'GALFORM',backgroundcolor='white')
+fax[1].text(-12.5,-0.37,'\\textsc{Buzzard}',backgroundcolor='white')
 #fax[2].text(-12.5,-0.3,'B$_{26.0}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.png')
