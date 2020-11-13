@@ -86,7 +86,7 @@ plot.close()
 ####################
 print('Making colour-mag (ab) plot')
 fig=plot.figure(figsize=(new_fig_size[0]*2,new_fig_size[1]))
-spec=gs.GridSpec(nrows=1,ncols=2,figure=fig,wspace=0,hspace=0,left=0.08,right=0.99,bottom=0.12,top=0.99)
+spec=gs.GridSpec(nrows=1,ncols=2,figure=fig,wspace=0,hspace=0,left=0.08,right=0.99,bottom=0.13,top=0.99)
 fax=[fig.add_subplot(spec[0,0]),fig.add_subplot(spec[0,1])]#,fig.add_subplot(spec[2,0])]
 temp=fax[1].get_yaxis().set_ticklabels([])
 #temp=fax[1].get_xaxis().set_ticklabels([])
@@ -113,8 +113,8 @@ L=len(zrange)
 fax[0].legend([patches.Patch(color=col_map(0.0/(L-0.8)),alpha=0.8),patches.Patch(color=col_map(2.0/(L-0.8)),alpha=0.8),
 				patches.Patch(color=col_map(4.0/(L-0.8)),alpha=0.8)],
 				['$z_{0.0,0.3}$','$z_{0.6,0.9}$','$z_{1.2,2.5}$'],fontsize=17,loc=2)
-fax[0].text(-12.5,-0.37,'GALFORM',backgroundcolor='white')
-fax[1].text(-12.5,-0.37,'\\textsc{Buzzard}',backgroundcolor='white')
+fax[0].text(-12.5,-0.38,'GALFORM',backgroundcolor='white')
+fax[1].text(-12.5,-0.38,'\\textsc{Buzzard}',backgroundcolor='white')
 #fax[2].text(-12.5,-0.3,'B$_{26.0}$')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.pdf')
 plot.savefig('/fast_scratch2/mbravo/MWdust_plots/mag_col_ab.png')
